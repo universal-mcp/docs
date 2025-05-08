@@ -1,0 +1,134 @@
+---
+description: 
+globs: *.mdx
+alwaysApply: false
+---
+Mintlify Documentation: Style & Best Practices Guide
+
+I. Core Principles
+User-Centricity: Always write with the user's goals and perspective in mind. Documentation should help users solve problems and achieve their objectives efficiently.
+Clarity & Conciseness: Strive for clear, straightforward language. Avoid jargon where possible or explain it upon first use. Be concise and to the point.
+Consistency: Maintain uniformity in terminology, formatting, voice, and style across all documentation. This builds trust and improves usability. (Sources 1.1, 2.1, 4.2, 7.1, 7.2)
+Accuracy: Ensure all information, especially code samples, API descriptions, and procedural steps, is technically correct and up-to-date. (Source 1.1)
+Scannability: Structure content so users can quickly find the information they need. Utilize headings, lists, and other formatting elements effectively. (Source 2.1)
+II. Content & Structure (Diátaxis Framework)
+Organize documentation around user needs. Consider the Diátaxis framework (tutorials, how-to guides, explanations, and reference) to ensure content has a clear purpose. (Source 1.2)
+
+Tutorials: Goal-oriented, learning-focused. Guide users through a series of steps to complete a project or learn a core concept.
+How-To Guides: Solution-oriented. Provide a series of steps to achieve a specific task. Assume some prior knowledge.
+Explanation (Conceptual Content): Understanding-oriented. Describe and clarify concepts, architecture, or design decisions.
+Reference: Information-oriented. Provide factual, technical descriptions of elements like APIs, configuration options, etc.
+III. Writing Style & Tone
+Voice:
+Use active voice primarily. (e.g., "Create a configuration file" instead of "A configuration file should be created"). (Source 2.1, 4.3)
+Write in the second person ("you") to directly address the reader. (Source 2.1, 5.3)
+Tone:
+Maintain a helpful, professional, and encouraging tone.
+Avoid overly casual language, slang, or colloquialisms, especially for localization. (Source 2.1)
+Avoid exclamation points where unnecessary. (Source 1.2)
+Language:
+Be concise: Cut unnecessary words. (Source 2.1)
+Clarity over cleverness: Use simple, direct language. (Source 2.1, 4.1)
+Terminology: Use consistent terminology. Define terms clearly upon first use or in a glossary. Avoid synonyms for the same concept within the same context (e.g., "API key" vs. "API token"). (Source 2.1)
+Avoid "Duh" Documentation: Don't document obvious steps (e.g., "Click Save to save"). (Source 2.1)
+Inclusive Language: Use language that is welcoming and respectful to all readers. (Source 4.1)
+IV. Formatting & Readability
+Headings & Subheadings:
+Use headings (H1, H2, H3, etc.) to create a clear hierarchy and improve scannability. Mintlify uses #, ##, ### for this. (Source 2.2, 5.3)
+Ensure heading titles are descriptive and reflect the content of the section.
+Paragraphs & Sentences:
+Keep paragraphs relatively short, focusing on a single idea. (Source 4.1, 4.3)
+Aim for an average sentence length of 15-20 words for better readability. (Source 4.1)
+Break up text-heavy paragraphs. (Source 2.1)
+Lists:
+Use bulleted lists for items where order doesn't matter.
+Use numbered lists for sequential steps or ordered items. (Source 4.1)
+Always include a lead-in sentence to provide context for the list. (Source 4.1)
+Code Blocks:
+Use Mintlify's code block components for displaying code.
+Specify the language for syntax highlighting.
+Ensure code is well-formatted, commented where necessary, and easily copy-pastable.
+Provide context or explanation for code samples.
+Emphasis:
+Use bold for UI elements, strong emphasis, or key terms.
+Use italics for mild emphasis or introducing new terms (though defining them is often better).
+Avoid underlining text that is not a link. (Source 3.1)
+Blockquotes:
+Use blockquotes (>) for highlighting notes, tips, warnings, or important information. Mintlify often has specific callout components (e.g., Note, Warning, Info) that are preferred for semantic meaning and consistent styling.
+Tables:
+Use tables to present structured data that is easier to understand in rows and columns.
+Keep tables simple and ensure they are responsive.
+LaTeX:
+Utilize Mintlify's LaTeX support for mathematical and scientific notation, enclosed in $ for inline and $$ for block equations. (Source 2.2)
+V. Links
+Internal Links:
+Link extensively to other relevant pages within the documentation to help users navigate and discover related information.
+Use root-relative links for pages within your Mintlify docs for better optimization (e.g., [link to text](/content/text)). (Source 2.2)
+Ensure link text is descriptive and clearly indicates the destination content (e.g., "Read the API Authentication guide" instead of "Click here"). (Source 4.1)
+External Links:
+Link to reputable external resources where appropriate (e.g., official language documentation, standards specifications).
+Consider opening external links in a new tab to keep users within your documentation.
+Link Validation:
+Regularly check for and fix broken links. Mintlify's CLI can help validate broken links. (Source 1.1, 2.2)
+VI. Icons & Images
+Icons:
+Use icons sparingly and purposefully to enhance understanding and visual appeal, not just for decoration.
+Ensure icons are consistent in style (e.g., line weight, color, fill).
+Use icons that are universally understood or provide alt text/tooltips if their meaning isn't immediately obvious.
+Mintlify may have built-in icon support or allow for custom icon sets. Refer to Mintlify's documentation for specific implementation. (Source 6.1)
+Images (Screenshots, Diagrams):
+Relevance: Only use images that add value and aid comprehension.
+Quality: Use high-resolution, clear images.
+Alt Text: Always provide descriptive alt text for all images for accessibility (screen readers) and SEO. (Source 3.3, 4.1)
+Annotation: Use callouts, arrows, or highlights on screenshots to point out specific elements.
+Minimizing Screenshots: Limit screenshots primarily to show users the starting point of a flow, allowing the product UI to guide the rest. Consider interactive demos (e.g., using tools like Arcade, as mentioned by Mintlify) as alternatives where appropriate. (Source 1.2)
+Diagrams: Use diagrams to explain complex systems or flows. Keep them clean and easy to understand.
+File Size: Optimize image file sizes to ensure fast page loads without sacrificing quality.
+VII. SEO (Search Engine Optimization)
+Keywords:
+Identify relevant keywords and phrases your target audience is likely to search for. (Source 3.1, 3.2)
+Incorporate these keywords naturally into page titles, headings, and body content.
+Page Titles & Meta Descriptions:
+Write clear, concise, and descriptive page titles (<title>) that include primary keywords. Keep titles under 60-70 characters. (Source 3.2)
+Provide unique meta descriptions for each page, summarizing its content and encouraging clicks from search results. (Source 3.1) Mintlify usually handles this through frontmatter.
+Descriptive URLs:
+Use clear, human-readable, and keyword-rich URLs (slugs). Mintlify typically generates these from your file structure and page titles. (Source 3.3)
+Content Quality & Freshness:
+High-quality, comprehensive, and up-to-date content is crucial for SEO. Regularly review and update documentation. (Source 3.3)
+Internal Linking: (As mentioned in Section V) Strong internal linking helps search engines understand the structure and importance of your content.
+Sitemap: Ensure Mintlify generates and maintains an up-to-date sitemap.xml for search engine crawlers. (Usually handled automatically by Mintlify).
+VIII. Design Consistency & Branding
+Layout:
+Maintain a consistent layout across all pages. Mintlify's theming and components help enforce this.
+Ensure a clean sidebar, readable color schemes, and a consistent overall layout. (Source 1.2)
+Typography & Colors:
+Adhere to the defined typography (fonts, sizes, weights) and color palette established in your Mintlify project's configuration (mint.json or custom CSS). (Source 7.1, 7.3)
+Custom Components & Styling:
+If using custom React components or CSS, ensure they align with the overall design system. (Source 2.3)
+Use custom styling with caution to avoid overriding core Mintlify styles in a way that introduces inconsistencies or breaks future updates. (Source 2.3)
+Branding:
+Ensure logos, favicons, and any brand-specific elements are used correctly as defined in the project setup.
+IX. AI & Automation (Mintlify Features)
+AI Ingestion & Search:
+Leverage Mintlify's AI capabilities for semantic search to help users find relevant information quickly. (Source 1.3)
+Ensure your content is well-structured and clearly written to be effectively processed by AI.
+CI Checks:
+Utilize Mintlify's CI checks (if available/configured) to automate style and consistency enforcement. (Source 1.1, 2.1)
+Consider using linters like Vale for more granular control over writing style. (Source 1.1, 2.1)
+X. Review & Maintenance
+Audit Regularly:
+Periodically audit documentation for accuracy, broken links, outdated information, and areas for improvement. (Source 1.1)
+Gather Feedback:
+Incorporate user feedback mechanisms (if available in Mintlify, e.g., page ratings, feedback forms) to understand pain points and improve content. (Source 1.2)
+Version Control:
+Treat documentation as code. Use version control (e.g., Git) to manage changes, collaborate, and maintain history. (Implicit from Mintlify's usual workflow).
+Update Schedule:
+Establish a process for updating documentation alongside product releases or changes. (Source 5.1)
+XI. Accessibility (WCAG Considerations)
+While not explicitly detailed in all Mintlify-specific searches, general best practices apply:
+
+Semantic HTML: Use appropriate HTML elements for their semantic meaning (Mintlify handles much of this).
+Image Alt Text: As mentioned in VI.2.
+Color Contrast: Ensure sufficient color contrast between text and background, adhering to WCAG guidelines. (Mintlify themes usually consider this).
+Keyboard Navigation: Ensure all interactive elements are navigable using a keyboard.
+Descriptive Link Text: As mentioned in V.1.

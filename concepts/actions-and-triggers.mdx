@@ -4,18 +4,20 @@ title: "Actions and Triggers"
 
 # Actions and Triggers
 
-This page will cover the core concepts of Actions and Triggers in the platform. 
+This page explains the core concepts of **Actions** and **Triggers** in the platform, and how you can use them to build powerful, responsive AI systems.
 
 ## Actions
 
-Actions enable models to dynamically call external functions or APIs, making them more useful for practical, real-world tasks. By augmenting their capabilities with up-to-date information, automation, and integration with other systems, Actions allow AI agents to interact with the world beyond static data.
+Actions enable your models to dynamically call external functions or APIs, making them more useful for real-world tasks. By augmenting their capabilities with up-to-date information, automation, and integration with other systems, Actions allow AI agents to interact with the world beyond static data.
 
 ### Why Use Actions?
+
 - **Access real-time data:** Fetch the latest information from external sources (e.g., weather, stock prices).
 - **Automate workflows:** Perform tasks like sending emails, updating databases, or triggering cloud functions.
 - **Integrate with other systems:** Connect your AI with tools like Slack, GitHub, or custom APIs.
 
 ### Example: Simple Calculator Action
+
 Below is an example of a simple calculator action that allows an LLM to perform mathematical calculations:
 
 ```python
@@ -33,7 +35,7 @@ def evaluate(self, expression: str) -> int:
     return eval(expression)
 ```
 
-This action can be called by the model to compute results on demand, enabling dynamic and context-aware responses.
+> **Note:** This action can be called by the model to compute results on demand, enabling dynamic and context-aware responses.
 
 ---
 
@@ -42,13 +44,25 @@ This action can be called by the model to compute results on demand, enabling dy
 Triggers act as a notification system for your AI applications, enabling your agents to respond dynamically to external events occurring within your integrations.
 
 ### How Triggers Work
+
 - **Event monitoring:** Triggers watch for specific events in applications like GitHub (e.g., new pull request), Gmail (e.g., new email), or any other integrated service.
 - **Agent notification:** When the event occurs, the trigger notifies your agent, which can then take appropriate action (e.g., respond, process, escalate).
 
 ### Example Use Cases
+
 - **GitHub:** Notify an agent when a new issue is created, so it can triage or label the issue automatically.
 - **Gmail:** Alert an agent when an important email arrives, prompting it to draft a reply or update a CRM.
 - **Custom integrations:** React to webhook events from any service, enabling endless automation possibilities.
+
+---
+
+## Best Practices
+
+- Use actions to extend your agent's capabilities with real-time data and automation.
+- Design triggers to respond to meaningful events and avoid unnecessary notifications.
+- Document each action and trigger clearly, including expected input and output.
+- Test your actions and triggers to ensure reliability and security.
+- Regularly review and update your actions and triggers to support new workflows and integrations.
 
 ---
 

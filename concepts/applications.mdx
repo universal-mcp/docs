@@ -12,7 +12,7 @@ title: "Applications"
 
 ---
 
-## What is an Application?
+# What is an Application?
 
 An **Application** represents an integration with an external service or platform. Applications provide a structured way to:
 
@@ -69,6 +69,8 @@ class ZenquotesApp(APIApplication):
 
 ## How to Create a New Application
 
+To create a new application, follow these steps:
+
 1. **Create a new package** following the naming convention: `universal_mcp_<app_name>`
 2. **Implement your application class** inheriting from one of the base classes
 3. **Name your class** following the convention: `<AppName>App`
@@ -91,6 +93,16 @@ class MyApp(APIApplication):
         # Implementation here
         pass
 ```
+
+---
+
+## Best Practices
+
+- Use clear, descriptive names for your application and actions.
+- Keep authentication and credential management secure and up-to-date.
+- Document each action and its expected input/output.
+- Handle errors gracefully and provide meaningful error messages.
+- Regularly review and update your application to support new features and maintain compatibility.
 
 ---
 

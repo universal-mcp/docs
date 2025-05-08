@@ -2,13 +2,19 @@
 title: "Connection"
 ---
 
-A connection represents a live, user-specific link between your application and an external service, established using a particular integration. When a user authorizes your app to access their data on a third-party service, AgentR creates a connection for that user, storing the necessary credentials (like OAuth tokens or API keys) securely. Each connection is uniquely identified by a `connectionId`.
+# What is a Connection?
 
-# Owner
+A **connection** is a secure, user-specific link between your application and an external service, established through a particular integration. When a user authorizes your app to access their data on a third-party service, AgentR creates a connection for that user and securely stores the required credentials (such as OAuth tokens or API keys). Each connection is uniquely identified by a `connectionId`.
 
-An Owner represents a connection to an external service (App) for a specific end-user.
+## Key Features
 
 - Associates authentication credentials with a specific Application and Integration in your Workspace
 - Stores security credentials (OAuth tokens, API keys, etc.) securely
 - Enables your agents to perform actions on behalf of specific end-users
 - Can be enabled, disabled, or deleted as needed
+
+## Owner
+
+An **Owner** represents a connection to an external service (App) for a specific end-user.
+
+> **Tip:** Use connections to manage user-specific access and actions securely across your integrations.
