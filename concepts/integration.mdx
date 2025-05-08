@@ -1,0 +1,58 @@
+---
+title: "Integration"
+---
+
+An **integration** defines how an application authenticates and communicates with external services and APIs. The Universal MCP system provides a robust framework for managing different types of integrations, each handling specific authentication methods and credential management.
+
+An integration refers to a configuration that defines how your app communicates with a specific external service or API (such as Salesforce, Zendesk, GitHub, etc.). AgentR provides hundreds of pre-built integrations for popular APIs. Each integration handles the API-specific logic and authentication requirements for that service.
+
+## Integration Types
+
+The system supports three main types of integrations:
+
+### API Key Integration
+
+- Simple authentication using API keys
+- Keys can be stored in environment variables, system keyring, or memory
+
+**Example configuration:**
+
+```json
+{
+  "name": "tavily",
+  "integration": {
+    "name": "TAVILY_API_KEY",
+    "type": "api_key",
+    "store": {
+      "type": "environment"  // Or "keyring", "memory"
+    }
+  }
+}
+```
+
+### OAuth Integration
+
+- Direct OAuth implementation for services not integrated with AgentR
+- Requires manual configuration of client IDs, secrets, and callback handling
+- More complex to set up but provides direct control over the OAuth flow
+
+Currently authentication methods supported are:
+
+// (You may want to list supported OAuth methods here if available)
+
+### AgentR Integration
+
+- Handles OAuth flows and credential management through the AgentR platform
+- Requires `AGENTR_API_KEY` environment variable
+
+**Example configuration:**
+
+```json
+{
+  "name": "github",
+  "integration": {
+    "name": "github",  // Matches service name in AgentR
+    "type": "agentr"
+  }
+}
+``` 

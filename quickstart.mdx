@@ -2,55 +2,75 @@
 title: "Quickstart"
 ---
 
-## This guide will walk you through the basic steps to set up an application with an action, using both the AgentR integration for cloud-based OAuth and credential management, and a local setup using API Key integration.
+# 🚀 Quickstart
 
-## **Using AgentR Cloud**
+Welcome! This guide will walk you through the basic steps to set up an application with an action, using both the AgentR integration for cloud-based OAuth and credential management, and a local setup using API Key integration.
 
-1. Visit [agentr.dev](http://agentr.dev) and signup
-2. [**<u>https://agentr.dev/quickstart</u>**](https://agentr.dev/quickstart)
-3. Enable required applications at [**<u>https://agentr.dev/apps</u>**](https://agentr.dev/apps)
+<CardGroup cols={2}>
+  <Card title="AgentR Cloud Setup" icon="cloud" href="#agentr-cloud">
+    Use the AgentR Cloud for seamless OAuth and credential management. Recommended for most users.
+  </Card>
+  <Card title="Local API Key Setup" icon="key" href="#local-setup">
+    Prefer to manage API keys yourself? Use the local setup for direct API key integration.
+  </Card>
+</CardGroup>
 
-## **Local Setup**
+---
 
-This option is suitable if you are working with an API that uses simple API key authentication and you want to manage it locally.
+## <span id="agentr-cloud">🟢 Using AgentR Cloud</span>
 
-**Prerequisites:**
+1. [Sign up at agentr.dev](https://agentr.dev)
+2. Visit the [Quickstart Guide](https://agentr.dev/quickstart)
+3. Enable required applications at [agentr.dev/apps](https://agentr.dev/apps)
 
+---
+
+## <span id="local-setup">🏠 Local Setup</span>
+
+> **Tip:** This option is suitable if you are working with an API that uses simple API key authentication and you want to manage it locally.
+
+### 📝 Prerequisites
 - You have an API key for the service you want to integrate with.
 
-**Steps:**
+### ⚙️ Steps
 
 1. **Choose a Credential Store:**
-   - **Environment Variable:** Store your API key in an environment variable (e.g., `MY_SERVICE_API_KEY`). This is common and secure.
-   - **Keyring:** Use the system's secure credential storage.
-   - **Memory:** For testing/temporary use only (not persistent).
-2. **Choose an Application class:** Use a pre built application or build your own application class. Refer to /applications to learn how to build your own.
-3. **Configure Integration and Initialize Application (Python):** In your Python script, set up the API key integration and initialize your application.
+   - 🗝️ **Environment Variable:** Store your API key in an environment variable (e.g., `MY_SERVICE_API_KEY`). This is common and secure.
+   - 🔐 **Keyring:** Use the system's secure credential storage.
+   - 🧪 **Memory:** For testing/temporary use only (not persistent).
+2. **Choose an Application class:** Use a pre-built application or [build your own application class](/applications).
+3. **Configure Integration and Initialize Application (Python):**
 
    ```python
    from universal_mcp.applications import APIApplication # Or your specific App class
    from universal_mcp.integrations import ApiKeyIntegration
    from universal_mcp.stores import EnvironmentStore, MemoryStore
    from universal_mcp.server import SingleAppMCPServer
-   
-   
+
    # Option 2b: Using MemoryStore (for quick testing)
    store_mem = MemoryStore()
    # Manually add the key to the memory store for this example
    # The 'name_in_store' is the key used within the store
    api_key_name_in_store = "MY_APP_API_KEY"
    store_mem.set(api_key_name_in_store, "dummy_api_key_12345") # Replace with your actual key
-   
+
    integration_mem = ApiKeyIntegration(
        name_in_store=api_key_name_in_store, # Key to lookup in the store
        store=store_mem,
    )
-   
+
    app_local_mem = MyApp(name="my-app", integration=integration_mem)
    print(f"Local App '{app_local_mem.name}' initialized. Actions: {app_local_mem.list_tools()}")
-   
+
    mcp = SingleAppMCPServer(app_local_mem)
-   
    ```
-4. **Ceate your MCP Server:**
-5. **Install MCP server**: Install mcp server on your favourite client using `mcp install`
+4. **Create your MCP Server.**
+5. **Install MCP server:** Install MCP server on your favourite client using:
+
+   ```sh
+   mcp install
+   ```
+
+---
+
+Need more help? Check the [full documentation](/docs) or [contact support](mailto:hi@mintlify.com).

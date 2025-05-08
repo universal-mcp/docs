@@ -1,0 +1,105 @@
+---
+title: "Applications"
+---
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+  <img className="block dark:hidden" src="/logo/light.svg" alt="Applications Logo" style={{ height: '40px' }} />
+  <img className="hidden dark:block" src="/logo/dark.svg" alt="Applications Logo" style={{ height: '40px' }} />
+  <h1 style={{ margin: 0 }}>Applications</h1>
+</div>
+
+> **Applications** are the foundation for integrating with external services and platforms (like GitHub, Google, Slack, etc.) in the Universal MCP system. They expose a set of **Actions** and **Triggers** for AI agents to use, enabling seamless automation and real-world interaction.
+
+---
+
+## What is an Application?
+
+An **Application** represents an integration with an external service or platform. Applications provide a structured way to:
+
+- Manage authentication and credentials
+- Handle API communication
+- Define available actions (tools)
+- Process responses and errors
+
+Applications are the building blocks for connecting your AI agents to the outside world.
+
+---
+
+## Base Classes for Applications
+
+The system provides three main base classes for building applications:
+
+- `BaseApplication`: The abstract base class that defines the common interface
+- `APIApplication`: For applications that communicate via HTTP APIs
+- `GraphQLApplication`: For applications that use GraphQL APIs
+
+> **See also:** [Actions and Triggers](/concepts/actions-and-triggers) | [Integration and Connection](/concepts/integration-and-connection)
+
+---
+
+## Implementation Example: Building an API Application
+
+Here's an example of building a simple API Application that fetches a random quote:
+
+```python
+from universal_mcp.applications import APIApplication
+
+class ZenquotesApp(APIApplication):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(name="zenquotes", **kwargs)
+
+    def get_quote(self) -> str:
+        """
+        Fetches a random inspirational quote from the Zen Quotes API.
+
+        Returns:
+            A formatted string containing the quote and its author in the format 'quote - author'
+        """
+        url = "https://zenquotes.io/api/random"
+        response = self._get(url)
+        data = response.json()
+        quote_data = data[0]
+        return f"{quote_data['q']} - {quote_data['a']}"
+
+    def list_tools(self):
+        return [self.get_quote]
+```
+
+---
+
+## How to Create a New Application
+
+1. **Create a new package** following the naming convention: `universal_mcp_<app_name>`
+2. **Implement your application class** inheriting from one of the base classes
+3. **Name your class** following the convention: `<AppName>App`
+4. **Define your actions** as methods and register them in `list_tools()`
+
+**Example skeleton:**
+
+```python
+from universal_mcp.applications import APIApplication
+
+class MyApp(APIApplication):
+    def __init__(self, name: str, integration=None, **kwargs):
+        super().__init__(name, integration, **kwargs)
+        self.base_url = "https://api.example.com"
+
+    def list_tools(self):
+        return [self.my_action]
+
+    def my_action(self):
+        # Implementation here
+        pass
+```
+
+---
+
+## Next Steps & Related Links
+
+- [Quickstart Guide](/quickstart)
+- [Actions and Triggers](/concepts/actions-and-triggers)
+- [Integration and Connection](/concepts/integration-and-connection)
+- [API Reference](/api-reference)
+- [Universal MCP SDK](https://github.com/your-org/universal-mcp-sdk)
+
+> Need help? [Contact support](mailto:hi@mintlify.com) or check the [full documentation](/docs). 

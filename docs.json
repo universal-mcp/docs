@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "AgentR Docs",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -11,45 +11,37 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Important Links",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "overview",
+              "quickstart"
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Concepts",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
+              "concepts/actions-and-triggers",
+              "concepts/applications",
+              "concepts/integration",
+              "concepts/connection"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "SDK",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "sdk/tool-manager",
+              "sdk/store",
+              "sdk/server"
+            ]
+          },
+          {
+            "group": "Platform",
+            "pages": [
+              "platform/authentication",
+              "platform/workspace"
             ]
           }
         ]
@@ -58,19 +50,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Get Started",
+          "href": "https://agentr.dev/quickstart",
+          "icon": "rocket"
         },
         {
           "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "href": "https://discord.com/invite/3Bmw6NS9XV",
+          "icon": "discord"
         }
       ]
     }
@@ -83,20 +70,20 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:manoj@agentr.dev"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://agentr.dev/apps"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/agentr_dev",
+      "github": "https://github.com/universal-mcp/",
+      "discord": "https://discord.com/invite/3Bmw6NS9XV"
     }
   }
 }

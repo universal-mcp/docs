@@ -1,0 +1,77 @@
+# Universal MCP System Overview
+
+The **Universal MCP system** is a framework designed to enable AI models to interact with external systems and APIs. It achieves this through a core set of components:
+
+- **Applications**
+- **Actions**
+- **Integration**
+- **Triggers**
+
+---
+
+## Applications
+
+Applications form the foundation for connecting to external services. They manage aspects like:
+
+- Authentication
+- API communication
+- Defining available operations
+- Handling responses and errors
+
+The system provides base classes to simplify the creation of new applications:
+
+- `BaseApplication` (abstract base class)
+- `APIApplication` (for HTTP APIs)
+- `GraphQLApplication` (for GraphQL APIs)
+
+> **Tip:** Creating a new application involves setting up a specific package structure and implementing a class that inherits from one of these base classes.
+
+---
+
+## Actions
+
+Actions define the specific operations that an application can perform. These allow AI models to:
+
+- Execute external functions
+- Call APIs
+- Process data
+- Interact with real-world systems
+
+**Key features of Actions:**
+
+- Dynamic function calling
+- Structured input/output
+- Integration with various authentication methods
+- Error handling
+- Tool management
+
+> **How to create custom actions:**
+> - Define methods within an application class
+> - Include type hints and docstrings
+> - Implement error handling
+> - Register them in the `list_tools()` method
+
+---
+
+## Integration
+
+Integration is the mechanism that allows Applications and Actions to work together. It handles:
+
+- Authentication
+- Credential management
+- API communication
+- Error handling
+
+The system supports several integration types, including:
+
+- API Key
+- OAuth
+- Basic Auth
+
+---
+
+## Triggers
+
+Triggers act as a notification system, enabling AI agents to respond dynamically to external events from integrated applications (like GitHub or Gmail).
+
+> When specific events occur in these applications, triggers notify the agents, allowing for real-time, event-driven workflows.

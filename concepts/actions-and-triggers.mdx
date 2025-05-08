@@ -1,0 +1,55 @@
+---
+title: "Actions and Triggers"
+---
+
+# Actions and Triggers
+
+This page will cover the core concepts of Actions and Triggers in the platform. 
+
+## Actions
+
+Actions enable models to dynamically call external functions or APIs, making them more useful for practical, real-world tasks. By augmenting their capabilities with up-to-date information, automation, and integration with other systems, Actions allow AI agents to interact with the world beyond static data.
+
+### Why Use Actions?
+- **Access real-time data:** Fetch the latest information from external sources (e.g., weather, stock prices).
+- **Automate workflows:** Perform tasks like sending emails, updating databases, or triggering cloud functions.
+- **Integrate with other systems:** Connect your AI with tools like Slack, GitHub, or custom APIs.
+
+### Example: Simple Calculator Action
+Below is an example of a simple calculator action that allows an LLM to perform mathematical calculations:
+
+```python
+def evaluate(self, expression: str) -> int:
+    """Evaluate a mathematical expression and return the result as an integer.
+
+    Args:
+        expression (str): A string containing a valid mathematical expression.
+                          Supports basic arithmetic operations (+, -, *, /, **).
+                          Example: "2 + 2", "3 * 4", "10 / 2"
+
+    Returns:
+        int: The result of evaluating the expression.
+    """
+    return eval(expression)
+```
+
+This action can be called by the model to compute results on demand, enabling dynamic and context-aware responses.
+
+---
+
+## Triggers
+
+Triggers act as a notification system for your AI applications, enabling your agents to respond dynamically to external events occurring within your integrations.
+
+### How Triggers Work
+- **Event monitoring:** Triggers watch for specific events in applications like GitHub (e.g., new pull request), Gmail (e.g., new email), or any other integrated service.
+- **Agent notification:** When the event occurs, the trigger notifies your agent, which can then take appropriate action (e.g., respond, process, escalate).
+
+### Example Use Cases
+- **GitHub:** Notify an agent when a new issue is created, so it can triage or label the issue automatically.
+- **Gmail:** Alert an agent when an important email arrives, prompting it to draft a reply or update a CRM.
+- **Custom integrations:** React to webhook events from any service, enabling endless automation possibilities.
+
+---
+
+By combining Actions and Triggers, you can build powerful, responsive AI systems that both act on demand and react to the world around them. 
