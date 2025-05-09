@@ -2,12 +2,113 @@
 title: "Store"
 ---
 
-Stores handle credential and sensitive data management. Supported store types include:
+Stores provide a secure and consistent way to manage credentials and sensitive data across different storage backends. Use stores to set, retrieve, and delete credentials in a unified manner, regardless of the underlying storage mechanism.
 
-MemoryStore (in-memory, for testing)
+## Features
 
-EnvironmentStore (uses environment variables, ideal for CI/CD)
+- Abstract base class defining a consistent interface for credential stores
+- Multiple storage backend implementations:
+  - In-memory store (temporary storage)
+  - Environment variable store
+  - System keyring store (secure credential storage)
+- Exception handling for common error cases
+- Type hints and comprehensive documentation
 
-KeyringStore (uses system keyring for secure storage)
+## When to Use Each Store
 
-Stores provide a consistent interface for setting, retrieving, and deleting credentials.
+Choose the store type that best fits your environment and security needs:
+
+- **MemoryStore**: Use for testing or temporary storage. Data is lost when the program exits.
+- **EnvironmentStore**: Ideal for CI/CD pipelines or containerized environments where environment variables are managed externally.
+- **KeyringStore**: Recommended for production and local development when you need secure, persistent storage using the system keyring.
+
+## Available Store Types
+
+### MemoryStore
+A simple in-memory store that persists data only for the duration of program execution. Useful for testing or temporary storage.
+
+```python
+from universal_mcp.stores import MemoryStore
+
+store = MemoryStore()
+store.set("api_key", "secret123")
+value = store.get("api_key")  # Returns "secret123"
+```
+
+### EnvironmentStore
+Uses environment variables to store and retrieve credentials. Useful for containerized environments or CI/CD pipelines.
+
+```python
+from universal_mcp.stores import EnvironmentStore
+
+store = EnvironmentStore()
+store.set("API_KEY", "secret123")
+value = store.get("API_KEY")  # Returns "secret123"
+```
+
+### KeyringStore
+Leverages the system's secure credential storage facility. Provides the most secure option for storing sensitive data.
+
+```python
+from universal_mcp.stores import KeyringStore
+
+store = KeyringStore(app_name="my_app")
+store.set("api_key", "secret123")
+value = store.get("api_key")  # Returns "secret123"
+```
+
+## Getting Started
+
+Here's how to use a store to set and retrieve a credential:
+
+```python
+from universal_mcp.stores import MemoryStore
+
+store = MemoryStore()
+store.set("api_key", "secret123")
+value = store.get("api_key")  # Returns "secret123"
+```
+
+Switch to `EnvironmentStore` or `KeyringStore` by importing and instantiating the relevant class.
+
+## Best Practices
+
+1. Use **KeyringStore** for production environments where security is a priority.
+2. Use **EnvironmentStore** for containerized or cloud environments.
+3. Use **MemoryStore** for testing or temporary storage only.
+4. Always handle `StoreError` and `KeyNotFoundError` exceptions appropriately.
+
+## Error Handling
+
+The store module provides specific exceptions:
+
+- `StoreError`: Base exception for all store-related errors.
+- `KeyNotFoundError`: Raised when a requested key is not found.
+
+Handle these exceptions to ensure robust credential management:
+
+```python
+from universal_mcp.stores import KeyNotFoundError
+
+try:
+    value = store.get("missing_key")
+except KeyNotFoundError:
+    print("Credential not found.")
+```
+
+## Dependencies
+
+- `keyring`: Required for the KeyringStore implementation
+- `loguru`: Used for logging operations in the KeyringStore
+
+## Contributing
+
+To add a new store implementation, inherit from `BaseStore` and implement all required abstract methods:
+
+- `get(key: str) -> Any`
+- `set(key: str, value: str) -> None`
+- `delete(key: str) -> None`
+
+---
+
+For a comprehensive guide, see the [Universal MCP Stores Reference](#universal-mcp-stores) below.

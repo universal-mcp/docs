@@ -2,8 +2,75 @@
 title: "Tool Manager"
 ---
 
-Tool Manager is reponsible for fetching, loading, organizing and calling tools.
+The **Tool Manager** is the central component for managing tools in Universal MCP. It provides a robust, extensible interface for registering, organizing, retrieving, and executing tools in your application.
+
+## What Does Tool Manager Do?
+
+Tool Manager helps you:
+
+- **Register** tools (functions or Tool objects) with automatic metadata extraction
+- **Organize** tools using tags for easy grouping and discovery
+- **Retrieve** tools by name for dynamic access
+- **Validate** arguments and handle errors before execution
+- **Execute** tools, supporting both sync and async functions
+- **List** tools in multiple formats (OpenAI, LangChain, MCP) for interoperability
+
+## Key Features
+
+- **Flexible Registration:** Add tools as functions or Tool objects. Metadata and type hints are automatically extracted.
+- **Comprehensive Lookup:** Retrieve tools by unique name. Get clear errors if a tool is missing.
+- **Format Conversion:** Export tools in OpenAI, LangChain, or MCP format for use in different frameworks.
+- **Tag-Based Organization:** Assign tags to group related tools (e.g., "math", "text").
+- **Validation & Error Handling:** Uses Pydantic for argument validation and provides informative error messages.
+- **Sync & Async Support:** Works with both synchronous and asynchronous tool functions.
+
+## Example: Registering and Using Tools
+
+```python
+from universal_mcp.tools import ToolManager
+
+def greet(name: str) -> str:
+    """Greets the user by name."""
+    return f"Hello, {name}!"
+
+manager = ToolManager()
+manager.add_tool(greet)
+
+tool = manager.get_tool("greet")
+result = tool.execute({"name": "Alice"})
+print(result)  # Output: Hello, Alice!
+```
+
+## Listing Tools in Different Formats
+
+You can export all registered tools in the format required by your integration:
+
+```python
+openai_tools = manager.list_tools(format="openai")
+langchain_tools = manager.list_tools(format="langchain")
+mcp_tools = manager.list_tools(format="mcp")
+```
+
+## Organizing Tools with Tags
+
+Tags help you group and filter tools:
+
+```python
+def add(a: int, b: int) -> int:
+    """Adds two numbers."""
+    return a + b
+
+manager.add_tool(add, tags=["math", "arithmetic"])
+math_tools = manager.list_tools(tags=["math"])
+```
+
+## Best Practices
+
+- Use clear, unique names for tools
+- Write detailed docstrings and use type hints
+- Handle errors gracefully in your tool functions
+- Use tags to organize related tools
 
 ## Adapters
 
-Adapters help you convert one tool to another.
+Adapters help you convert tools between formats (e.g., OpenAI, LangChain, MCP). See the [Adapters documentation](/sdk/adapters) for more details.
