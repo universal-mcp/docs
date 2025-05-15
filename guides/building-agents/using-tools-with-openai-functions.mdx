@@ -13,8 +13,8 @@ Universal MCP tools can be easily adapted for use with the OpenAI API.
     ```python
     from universal_mcp.tools import ToolManager
     # Assuming you have app instances or custom functions
-    # tool_manager.register_tools_from_app(my_app)
-    # tool_manager.add_tool(my_custom_function)
+    tool_manager.register_tools_from_app(my_app)
+    tool_manager.add_tool(my_custom_function)
     ```
 
 2.  **Convert Tools to OpenAI Format:**
@@ -106,5 +106,5 @@ This process allows you to leverage OpenAI's powerful models for reasoning and t
 
 ```
 [1] tools/adapters.py - convert_tool_to_openai_tool, ToolFormat
-[2] exmples.xml - examples/github.py
+[2] examples/agents/github.py
 ```

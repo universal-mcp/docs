@@ -52,7 +52,7 @@ Develop an agent that can:
      find_my_user(self) -> returns {"data": {"id": "USER_ID", ...}}
 
     tool_manager.add_tool(twitter_app.users_id_like, name="like_tweet")
-    # tool_manager.add_tool(twitter_app.users_id_unlike, name="unlike_tweet") # Not used in this specific task
+    tool_manager.add_tool(twitter_app.users_id_unlike, name="unlike_tweet") # Not used in this specific task
     tool_manager.add_tool(twitter_app.find_my_user, name="find_my_user_id")
     ```
     *Self-note: The actual method names in `twitter_app` might differ; this is illustrative based on the `like_tweet.py` example's tool naming.*
@@ -106,8 +106,8 @@ Develop an agent that can:
         )
         print(result["messages"][-1].content)
 
-    # import asyncio
-    # asyncio.run(main())
+    import asyncio
+    asyncio.run(main())
     ```
 
 ## How It Works
@@ -121,5 +121,5 @@ Develop an agent that can:
 This example shows how an agent can perform a sequence of tool calls, using the output of one tool (user ID) as input for another, to accomplish a task.
 
 ```
-[1] exmples.xml - examples/like_tweet.py
+[1] examples/agents/like_tweet.py
 ```
