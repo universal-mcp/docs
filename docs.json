@@ -122,6 +122,11 @@
           "icon": "rocket"
         },
         {
+          "anchor": "GitHub",
+          "href": "https://github.com/universal-mcp/universal-mcp",
+          "icon": "github"
+        },
+        {
           "anchor": "Community",
           "href": "https://discord.com/invite/3Bmw6NS9XV",
           "icon": "discord"
