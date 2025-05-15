@@ -83,13 +83,23 @@
             "group": "Building AI Agents with MCP Tools",
             "pages": [
               "guides/building-agents/introduction",
-              "guides/building-agents/using-tools-with-langchain",
-              "guides/building-agents/example-calculator-agent",
-              "guides/building-agents/example-reddit-summarizer",
-              "guides/building-agents/example-tweet-interactions",
-              "guides/building-agents/example-blog-generator",
-              "guides/building-agents/using-tools-with-openai-functions",
-              "guides/building-agents/example-github-agent"
+              {
+                "group": "Langgraph Agents",
+                "pages": [
+                  "guides/building-agents/using-tools-with-langchain",
+                  "guides/building-agents/example-calculator-agent",
+                  "guides/building-agents/example-reddit-summarizer",
+                  "guides/building-agents/example-tweet-interactions",
+                  "guides/building-agents/example-blog-generator"
+                ]
+              },
+              {
+                "group": "OpenAI Agents",
+                "pages": [
+                  "guides/building-agents/using-tools-with-openai-functions",
+                  "guides/building-agents/example-github-agent"
+                ]
+              }
             ]
           },
           {
