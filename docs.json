@@ -109,14 +109,6 @@
               "guides/advanced-cli/initializing-new-mcp-project",
               "guides/advanced-cli/in-depth-server-types"
             ]
-          },
-          {
-            "group": "Universal MCP Playground",
-            "pages": [
-              "guides/playground/introduction-to-playground",
-              "guides/playground/setting-up-running-playground",
-              "guides/playground/using-the-playground-interface"
-            ]
           }
         ]
       }
