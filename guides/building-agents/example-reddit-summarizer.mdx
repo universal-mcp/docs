@@ -1,0 +1,131 @@
+---
+title: Building a Reddit Content Summarizer with Langchain
+---
+
+This guide demonstrates how to create an AI agent that can fetch posts from a subreddit, categorize them, summarize the content, and then email the summary. It utilizes tools from the Universal MCP `reddit` and `google-mail` applications. This example is based on `examples/reddit_summary.py`. [1]
+
+## Objective
+
+Build an agent that, given a subreddit name and an email address:
+1.  Fetches the latest posts from the subreddit.
+2.  Organizes posts by category (News, Discussion, etc.).
+3.  Provides a concise summary for each category, including post titles, authors, and links.
+4.  Sends this Markdown-formatted summary to the specified email address.
+
+## Steps
+
+1.  **Set up Applications:**
+    We need the `reddit` application to fetch posts and the `google-mail` (or any email) application to send the summary. We'll use `app_from_slug` and `AgentRIntegration` for managing credentials via AgentR.
+
+    ```python
+    from universal_mcp.applications import app_from_slug
+    from universal_mcp.integrations import AgentRIntegration
+
+    def get_application(name: str):
+        AppClass = app_from_slug(name)
+        # Assumes 'name' matches an integration configured on AgentR
+        integration = AgentRIntegration(name)
+        instance = AppClass(integration=integration)
+        return instance
+
+    reddit_app = get_application("reddit")
+    email_app = get_application("google-mail") # Or your preferred email app slug
+    ```
+
+2.  **Initialize LLM and ToolManager:**
+    ```python
+    import os
+    from langchain_openai import ChatOpenAI
+    from universal_mcp.tools import ToolManager
+    from universal_mcp.tools.adapters import ToolFormat
+
+    model_name = os.environ.get("OPEN_AI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name)
+    tool_manager = ToolManager()
+    ```
+
+3.  **Register Tools from Applications:**
+    The `ToolManager` will register all tools exposed by the `reddit` and `email` applications.
+
+    ```python
+    tool_manager.register_tools_from_app(reddit_app)
+    tool_manager.register_tools_from_app(email_app)
+    ```
+    This automatically makes tools like `reddit_get_hot_posts` (or similar, depending on the Reddit app's implementation) and `google-mail_send_email` available.
+
+4.  **Get Tools in Langchain Format:**
+    ```python
+    langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
+    ```
+
+5.  **Create the Langchain Agent:**
+    Define a system prompt that guides the agent through the summarization and emailing process.
+
+    ```python
+    from langgraph.prebuilt import create_react_agent
+
+    agent_executor = create_react_agent(
+        llm,
+        tools=langchain_tools,
+        prompt="You are a helpful assistant that can use tools to help the user." # General prompt
+    )
+    ```
+
+6.  **Define the Agent's Task Prompt:**
+    This detailed prompt outlines the multi-step task.
+
+    ```python
+    agent_task_prompt_template = """
+    You are a helpful assistant. For the given subreddit, fetch the latest posts,
+    organize them by category (such as News, Discussion, Question, Meme, etc.),
+    and provide a concise summary for each category. Format the output as a
+    well-structured Markdown document, including:
+
+    - A main heading with the subreddit name
+    - Subheadings for each category
+    - Bullet points or short paragraphs summarizing the key posts in each category
+    - For each post, include the title (as a Markdown link to the post), author, and a brief summary
+
+    After summarizing, share the Markdown-formatted summary.
+
+    Send the summary to the email address: {send_to_email}
+    Subreddit: {subreddit}
+    """
+    ```
+
+7.  **Invoke the Agent:**
+    Get user input for the subreddit and email, then run the agent.
+
+    ```python
+    async def main():
+        # ... (LLM, ToolManager, App setup) ...
+
+        subreddit = input("Enter the subreddit: ")
+        send_to_email = input("Enter the email to send the summary to: ")
+
+        filled_prompt = agent_task_prompt_template.format(
+            subreddit=subreddit,
+            send_to_email=send_to_email
+        )
+
+        result = await agent_executor.ainvoke(
+            input={"messages": [{"role": "user", "content": filled_prompt}]}
+        )
+        print(result["messages"][-1].content)
+
+    import asyncio
+    asyncio.run(main())
+    ```
+
+## How It Works
+
+The agent will:
+1.  Use a Reddit tool (e.g., `reddit_get_hot_posts`) to fetch data from the specified subreddit.
+2.  Process this data according to the prompt (categorize, summarize). This part is done by the LLM's reasoning.
+3.  Once the Markdown summary is generated, it will use an email tool (e.g., `google-mail_send_email`) to send the content to the target email address.
+
+This example showcases how an agent can orchestrate multiple tools from different MCP applications to achieve a complex user goal.
+
+```
+ exmples.xml - examples/reddit_summary.py
+```

@@ -1,0 +1,73 @@
+---
+title: Leveraging AgentR Integration
+---
+
+The `AgentRIntegration` provides a streamlined way for your Universal MCP applications to authenticate with services when your credentials and application configurations are managed through the AgentR platform (agentr.dev).
+
+## How `AgentRIntegration` Works
+
+Instead of managing individual API keys or OAuth flows directly within your local Universal MCP server configuration for each service, `AgentRIntegration` centralizes this by communicating with the AgentR API.
+
+1.  **Initialization:** You initialize `AgentRIntegration` with a `name` (which corresponds to the integration name defined on the AgentR platform, e.g., "github", "google-mail") and your AgentR API key. [1]
+    ```python
+    from universal_mcp.integrations import AgentRIntegration
+
+    # Your AgentR API key (from environment variable or directly)
+    agentr_api_key = os.getenv("AGENTR_API_KEY")
+    github_agentr_integration = AgentRIntegration(name="github", api_key=agentr_api_key)
+    ```
+
+2.  **Getting Credentials:** When an `Application` needs credentials (e.g., `my_github_app.integration.get_credentials()`), the `AgentRIntegration` uses its `AgentrClient` to make an API call to `https://api.agentr.dev/api/{integration_name}/credentials/`. [2]
+    *   This request is authenticated using your main AgentR API key.
+    *   The AgentR API returns the specific credentials (e.g., an OAuth access token for GitHub) that AgentR has stored for you for that particular service integration.
+
+3.  **Authorization Flow:** If credentials are not found or are invalid, `AgentRIntegration.authorize()` is called.
+    *   This method, via `AgentrClient`, calls the AgentR API endpoint `https://api.agentr.dev/api/{integration_name}/authorize/`. [2]
+    *   The AgentR API returns an authorization URL.
+    *   The `NotAuthorizedError` raised by `get_credentials` will include this URL, prompting the user to visit it to authorize the application via the AgentR platform. AgentR then securely handles the OAuth dance or credential input and stores the resulting token/key.
+
+## `AgentrClient`
+
+The `AgentrClient` (from `utils/agentr.py`) is a helper class used internally by `AgentRIntegration`. It's responsible for: [2]
+*   Making authenticated GET requests to the AgentR API endpoints.
+*   Requires an `AGENTR_API_KEY` (either passed during initialization or from the environment variable).
+*   Fetching service-specific credentials.
+*   Fetching authorization URLs.
+*   Fetching a list of applications configured for your account on AgentR (used by `AgentRServer`).
+
+## Usage in Applications
+
+When you load an application that is intended to be used with AgentR-managed credentials, you pass an `AgentRIntegration` instance to it.
+
+**Example from `examples/reddit_summary.py`:** [3]
+```python
+from universal_mcp.applications import app_from_slug
+from universal_mcp.integrations import AgentRIntegration
+
+def get_application(name: str):
+    AppClass = app_from_slug(name)
+    # The 'name' here (e.g., "reddit") must match an integration
+    # you've set up for your account on agentr.dev.
+    integration = AgentRIntegration(name) # AGENTR_API_KEY is picked from env by default
+    instance = AppClass(integration=integration)
+    return instance
+
+reddit_app = get_application("reddit")
+email_app = get_application("google-mail")
+```
+Here, when `reddit_app` or `email_app` need to make an API call, their `_get_headers()` method will ask their `AgentRIntegration` for credentials. The integration will then fetch the necessary tokens from the AgentR backend.
+
+## `AgentRServer`
+
+If you configure your Universal MCP server with `type: "agentr"` in `ServerConfig`, it becomes an `AgentRServer`. This server type: [4]
+*   Uses `AgentrClient` to fetch the list of applications (`AppConfig`) you have enabled on the AgentR platform.
+*   For each fetched application, it automatically configures an `AgentRIntegration` for it.
+*   This means you don't need to list `apps` or their specific integrations in your local `ServerConfig` file; AgentR becomes the source of truth for that.
+
+Using `AgentRIntegration` simplifies credential management by delegating it to the AgentR platform, especially useful for OAuth-based services and when managing many integrations.
+
+``` integrations/integration.py - AgentRIntegration class
+ utils/agentr.py - AgentrClient class and its methods
+ exmples.xml - examples/reddit_summary.py - get_application function
+ servers/server.py - AgentRServer class
+```

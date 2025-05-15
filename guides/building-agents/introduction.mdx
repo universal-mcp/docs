@@ -1,0 +1,37 @@
+---
+title: Building AI Agents with MCP Tools
+---
+
+# Building AI Agents with MCP Tools
+
+The primary goal of Universal MCP is to empower AI models, transforming them into capable agents that can interact with and perform actions in the digital world. This is achieved by providing these AI models with a well-defined set of **Tools** derived from various **Applications**.
+
+## What is an AI Agent in this Context?
+
+An AI agent, in the context of Universal MCP, is typically an LLM (Large Language Model) combined with a framework (like Langchain or a custom OpenAI Functions setup) that allows it to:
+
+1.  **Understand a user's request or a goal.**
+2.  **Reason about which tools it has available and which ones can help achieve the goal.**
+3.  **Decide which tool to use and with what arguments.**
+4.  **Interpret the output of the tool.**
+5.  **Continue the process, potentially using more tools, until the goal is achieved or it determines it cannot proceed.**
+6.  **Formulate a final response to the user.**
+
+## The Role of Universal MCP Tools
+
+Universal MCP sits between your AI agent logic and the external services.
+*   **You define Applications** that connect to external services (e.g., GitHub, Reddit, your company's internal API).
+*   **These Applications expose Actions** (methods) that become **Tools** when registered with the `ToolManager`.
+*   The `ToolManager` then **converts these Tools into a format** that your chosen AI agent framework (like Langchain or OpenAI's API) can understand and use.
+
+This decoupling means your agent doesn't need to know the low-level details of how to call the Reddit API; it just needs to know there's a `reddit_get_latest_posts` tool and how to use it based on its description and parameters.
+
+## Agent Frameworks
+
+In the following guides, we'll explore how to integrate Universal MCP tools with two popular approaches:
+
+*   **Langchain (specifically with LangGraph):** A powerful framework for building stateful, multi-actor applications with LLMs. We'll see how MCP tools can be seamlessly used within Langchain agent setups.
+*   **OpenAI Functions/Tools API:** Directly using OpenAI's models that support tool calling, by providing them with MCP tool definitions.
+
+By the end of this section, you'll be able to build agents capable of leveraging the diverse functionalities you've exposed through Universal MCP.
+```

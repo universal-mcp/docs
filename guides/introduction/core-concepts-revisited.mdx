@@ -1,0 +1,49 @@
+---
+title: Core Concepts Revisited
+---
+
+To effectively use Universal MCP, it's helpful to have a clear understanding of its fundamental building blocks. Here's a quick recap of the key concepts you'll encounter throughout these guides:
+
+## Applications
+
+**Applications** are the cornerstone for connecting to external services. They act as wrappers around external APIs or systems, managing crucial aspects such as:
+
+*   **Authentication:** Handling API keys, OAuth tokens, or other credential types.
+*   **API Communication:** Defining how to talk to the specific service.
+*   **Operation Definition:** Specifying the available functions (Actions) the service offers.
+*   **Response & Error Handling:** Standardizing how responses and errors from the service are managed.
+
+Universal MCP provides base classes like `BaseApplication`, `APIApplication` (for HTTP APIs), and `GraphQLApplication` (for GraphQL APIs) to simplify the creation of new application integrations. [1]
+
+## Actions
+
+**Actions** define the specific operations or capabilities that an Application can perform. They are the functions that AI models can invoke to:
+
+*   Execute external functions.
+*   Call specific API endpoints.
+*   Process data.
+*   Interact with real-world systems in a defined way.
+
+Key features of Actions include dynamic function calling, structured inputs and outputs, integration with various authentication methods, error handling, and tool management. You create custom actions by defining methods within an application class. [1]
+
+## Integration
+
+**Integration** is the mechanism that allows Applications and Actions to work seamlessly together. It's responsible for the nitty-gritty details of:
+
+*   **Authentication:** Securely managing and applying credentials.
+*   **Credential Management:** Storing and retrieving sensitive information.
+*   **API Communication:** Facilitating the actual data exchange with the external service.
+*   **Error Handling:** Providing a consistent way to manage errors during communication.
+
+The system supports various integration types, including API Key, OAuth, and Basic Authentication. [1]
+
+## Triggers
+
+**Triggers** serve as a notification system, enabling AI agents to react dynamically to events originating from external, integrated applications. For instance:
+
+*   A new commit in a GitHub repository.
+*   A new email arriving in a Gmail inbox.
+
+When these specific events occur, Triggers notify the AI agents, allowing them to respond proactively and intelligently. [1]
+
+Understanding these core components will provide a solid foundation as you explore the guides and start building powerful AI-driven solutions with Universal MCP.

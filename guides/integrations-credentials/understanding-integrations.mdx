@@ -1,0 +1,56 @@
+---
+title: Understanding Integrations in Universal MCP
+---
+
+In Universal MCP, an **Integration** is a crucial component that defines how an `Application` authenticates and authorizes itself with an external service provider. It handles the complexities of managing credentials and applying them correctly when an Application makes calls to an API.
+
+## The Role of an Integration
+
+The primary responsibilities of an Integration object are:
+
+1.  **Authorization:** Implementing the specific steps required to authorize the application with the external service. This might involve redirecting a user for an OAuth flow or prompting for an API key.
+2.  **Credential Storage and Retrieval:** Securely obtaining and providing credentials (like API keys, access tokens, refresh tokens) when an Application needs them to make an authenticated request. This is often done in conjunction with a [Store](#guides/integrations-credentials/secure-credential-storage).
+3.  **Credential Refresh (for OAuth):** Handling the process of refreshing access tokens when they expire, ensuring continuous access for the Application.
+
+By abstracting these concerns into an `Integration` object, `Applications` can focus on the logic of interacting with the service's API endpoints, rather than the boilerplate of authentication.
+
+## The `Integration` Base Class
+
+All specific integration types in Universal MCP inherit from the `Integration` abstract base class (defined in `integrations/integration.py`). This class defines a common interface with key methods: [1]
+
+*   `__init__(self, name: str, store: BaseStore | None = None)`: Initializes the integration with a name (often used as a key for storing/retrieving credentials) and an optional `Store` instance.
+*   `authorize() -> str | dict[str, Any]`: Abstract method to initiate the authorization process. Returns information needed to complete authorization, like a URL or instructions.
+*   `get_credentials() -> dict[str, Any]`: Abstract method to retrieve the necessary credentials for the integration.
+*   `set_credentials(self, credentials: dict[str, Any]) -> None`: Abstract method to store new credentials.
+
+## Supported Integration Types
+
+Universal MCP provides several built-in integration types:
+
+*   **`ApiKeyIntegration`**: For services that use simple API key-based authentication. [1]
+*   **`OAuthIntegration`**: For services that use OAuth 2.0 flows (though the current implementation in `integration.py` seems to be a more general OAuth outline and might need further details for a full 2.0 flow with refresh tokens, etc.).
+*   **`AgentRIntegration`**: A specialized integration for services managed through the AgentR platform. It uses an AgentR API key to securely fetch service-specific credentials managed by AgentR. [1, 2]
+
+You typically associate an `Integration` instance with an `Application` instance when you create it:
+
+```python
+from universal_mcp.applications import APIApplication
+from universal_mcp.integrations import ApiKeyIntegration
+from universal_mcp.stores import EnvironmentStore
+
+# Example: MyServiceApp uses an API key stored in an environment variable
+my_store = EnvironmentStore()
+api_key_integration = ApiKeyIntegration(name="MY_SERVICE_API_KEY", store=my_store)
+my_app = APIApplication(name="myservice", integration=api_key_integration)
+```
+
+In the `ServerConfig` (e.g., in your `local_config.json`), you can also define integrations for specific applications. [3]
+
+The `integrations/README.md` file provides a high-level overview of these concepts. [4]
+
+```
+ integrations/integration.py - Integration class, ApiKeyIntegration, AgentRIntegration
+ utils/agentr.py - AgentrClient class
+ config.py - IntegrationConfig within AppConfig
+ integrations/README.md
+```

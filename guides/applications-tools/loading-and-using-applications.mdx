@@ -1,0 +1,105 @@
+---
+title: Loading and Using Applications
+---
+
+Universal MCP makes it straightforward to incorporate and use applications within your server, enabling your AI agents to access their tools.
+
+## Dynamic Application Loading with `app_from_slug`
+
+One of the powerful features of Universal MCP is its ability to dynamically load application packages. If an application follows the standard naming convention (`universal-mcp-<app-name>`), it can often be loaded using the `app_from_slug` function.
+
+The `app_from_slug` function (found in `universal_mcp.applications.__init__.py`) handles several tasks:
+1.  **Derives Names:** It determines the expected package name (e.g., `universal_mcp_my_app`), module path (e.g., `universal_mcp_my_app.app`), and class name (e.g., `MyAppApp`) from the provided slug (e.g., `"my-app"`).
+2.  **Installs/Upgrades Package:** It attempts to install or upgrade the application package from the universal-mcp GitHub repository using `uv`. The packages are installed into a dedicated directory (usually `~/.universal-mcp/packages/`).
+3.  **Imports Module:** It imports the application module.
+4.  **Retrieves Class:** It gets the application class from the imported module.
+
+**Usage Example:**
+
+Let's say you want to use the `reddit` application.
+
+```python
+from universal_mcp.applications import app_from_slug
+from universal_mcp.integrations import AgentRIntegration # Or another appropriate integration
+
+# Dynamically load the Reddit application class
+try:
+    RedditAppClass = app_from_slug("reddit")
+except ModuleNotFoundError as e:
+    print(f"Failed to load application: {e}")
+    # Handle error, perhaps guide user to install or check slug
+    exit()
+except AttributeError as e:
+    print(f"Class not found in application: {e}")
+    exit()
+
+# Configure an integration (if needed by the application)
+# For applications using AgentR for credential management:
+reddit_integration = AgentRIntegration(name="reddit") # 'name' should match the integration configured on AgentR
+
+# For other integrations, you might use ApiKeyIntegration, etc.
+# e.g., an_api_key_integration = ApiKeyIntegration(name="MY_REDDIT_API_KEY_CONFIG", store=my_store)
+
+# Instantiate the application
+reddit_app_instance = RedditAppClass(integration=reddit_integration)
+
+# Now you can register its tools with a ToolManager
+# tool_manager.register_tools_from_app(reddit_app_instance)
+```
+
+This approach is commonly used in the example agent scripts (like `examples/reddit_summary.py` or `examples/like_tweet.py`) to quickly set up applications.
+
+## Manual Application Instantiation
+
+If your application is part of your local project or you prefer more direct control, you can import and instantiate it directly:
+
+```python
+# Assuming 'my_custom_app_module.py' contains 'MyCustomApp' class
+from my_custom_app_module import MyCustomApp
+from universal_mcp.integrations import ApiKeyIntegration
+from universal_mcp.stores import EnvironmentStore
+
+# Configure an integration
+my_api_key_store = EnvironmentStore()
+my_custom_app_integration = ApiKeyIntegration(name="MY_SERVICE_API_KEY", store=my_api_key_store)
+
+# Instantiate
+my_app = MyCustomApp(integration=my_custom_app_integration)
+
+# Register tools
+# tool_manager.register_tools_from_app(my_app)
+```
+
+## Configuring Applications in `ServerConfig`
+
+When running a `LocalServer`, you typically define which applications to load in your server configuration file (e.g., `local_config.json`):
+
+```json
+{
+  // ... other server settings ...
+  "apps": [
+    {
+      "name": "reddit" // This slug will be used by app_from_slug internally
+      // Optional: add integration config if not using a global or AgentR managed one
+      // "integration": {
+      //   "name": "REDDIT_API_KEY_CONFIG",
+      //   "type": "api_key",
+      //   "store": {"type": "environment"}
+      // }
+    },
+    {
+      "name": "my-local-app-slug" // For another app
+    }
+  ]
+}
+```
+The `LocalServer` will then iterate through this `apps` list, use `app_from_slug` to load each application class, instantiate it (potentially with the specified integration), and then register its tools.
+
+Once an application is instantiated, its primary use is to provide tools to a `ToolManager`, which then makes them available to AI agents.
+
+```
+[1] applications/__init__.py - app_from_slug function and package installation logic
+[2] utils/common.py - get_default_class_name, get_default_module_path, get_default_package_name functions
+[3] examples/reddit_summary.py, examples/like_tweet.py - get_application function
+[4] servers/server.py - LocalServer._load_app and LocalServer._load_apps methods
+```

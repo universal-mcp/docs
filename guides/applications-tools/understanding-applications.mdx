@@ -1,0 +1,52 @@
+---
+title: Understanding Applications
+---
+
+In Universal MCP, **Applications** are the fundamental building blocks for connecting your AI agents to external services and APIs. They act as specialized connectors or drivers that understand how to communicate with a particular service, manage its authentication, and expose its functionalities as usable **Actions** (Tools).
+
+## The Role of an Application
+
+An Application in Universal MCP is responsible for:
+
+1.  **Connection Management:** Establishing and maintaining communication with the external service. This could involve setting base URLs for HTTP APIs or handling GraphQL client instances.
+2.  **Authentication:** Securely managing and applying the necessary credentials (API keys, OAuth tokens, etc.) to authenticate requests to the service. This is often handled in conjunction with an [Integration](#guides/integrations-credentials/understanding-integrations).
+3.  **Defining Operations (Actions/Tools):** Exposing the capabilities of the external service as a list of well-defined functions (Actions or Tools) that an AI agent can call.
+4.  **Data Transformation:** Potentially transforming data to and from the format expected by the external service and the format understood by the AI agent.
+5.  **Error Handling:** Managing and standardizing errors that might occur during interaction with the external service.
+
+## Base Application Classes
+
+Universal MCP provides several base classes to simplify the development of new applications, catering to common communication patterns:
+
+*   **`BaseApplication`**:
+    This is the abstract base class that all applications must inherit from. It defines the common interface, including the essential `list_tools()` method which every application must implement to declare the tools it provides. [1]
+
+*   **`APIApplication`**:
+    This class extends `BaseApplication` and is designed for applications that interact with standard HTTP/RESTful APIs. It includes:
+    *   An integrated `httpx.Client` for making HTTP requests (`_get`, `_post`, `_put`, `_delete`, `_patch`).
+    *   Logic to automatically include authentication headers based on the configured `Integration`.
+    *   Management of a `base_url` for the API. [2]
+
+*   **`GraphQLApplication`**:
+    A specialized class extending `BaseApplication` for services that use GraphQL APIs. It provides:
+    *   An integrated `gql.Client` for executing GraphQL queries and mutations.
+    *   Similar to `APIApplication`, it handles authentication headers derived from its `Integration`.
+    *   Methods like `query()` and `mutate()` for interacting with the GraphQL endpoint. [3]
+
+## Creating a New Application
+
+When you need to connect to a new service not yet supported, you'll typically create a new Python class that inherits from one of these base classes. For example, if you're integrating a new REST API, you'd likely inherit from `APIApplication`.
+
+The key aspects you'll implement are:
+*   The constructor (`__init__`) to set up any specific configurations (like the `base_url`).
+*   Methods that represent the individual tools (Actions) the application offers.
+*   The `list_tools()` method to return a list of these tool methods.
+
+By encapsulating the specifics of interacting with an external service within an Application, Universal MCP promotes modularity and reusability. Your AI agents can then interact with a variety of services through a consistent tool-based interface.
+
+```
+ applications/application.py - BaseApplication class
+ applications/application.py - APIApplication class
+ applications/application.py - GraphQLApplication class
+ applications/README.md - Overview of creating a new application
+```

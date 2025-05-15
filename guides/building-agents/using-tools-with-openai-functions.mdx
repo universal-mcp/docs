@@ -1,0 +1,110 @@
+---
+title: Using MCP Tools with OpenAI Functions/Tools API
+---
+
+OpenAI's newer models (like GPT-3.5 Turbo, GPT-4, and GPT-4o) support "tool calling" (previously known as function calling). This allows you to describe your tools (functions) to the model, and the model can then output a JSON object indicating it wants to call one or more of those tools with specific arguments.
+
+Universal MCP tools can be easily adapted for use with the OpenAI API.
+
+## Core Steps
+
+1.  **Initialize `ToolManager` and Register Tools:**
+    As with Langchain, start by setting up your `ToolManager` and registering all necessary tools from your Applications or custom functions.
+    ```python
+    from universal_mcp.tools import ToolManager
+    # Assuming you have app instances or custom functions
+    # tool_manager.register_tools_from_app(my_app)
+    # tool_manager.add_tool(my_custom_function)
+    ```
+
+2.  **Convert Tools to OpenAI Format:**
+    The `ToolManager` can list tools in the JSON schema format expected by the OpenAI API.
+    ```python
+    from universal_mcp.tools.adapters import ToolFormat
+    openai_tools_json = tool_manager.list_tools(format=ToolFormat.OPENAI)
+    ```
+    This uses the `convert_tool_to_openai_tool` adapter, which formats each MCP `Tool`'s name, description, and parameters schema into the required structure.
+
+3.  **Make the API Call to OpenAI:**
+    When making a `client.chat.completions.create` call, include the `tools` parameter with the JSON obtained in the previous step, and set `tool_choice` (e.g., to `"auto"` to let the model decide, or to a specific tool).
+
+    ```python
+    import os
+    from openai import OpenAI
+
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY")) # Configure your client
+
+     messages = [{"role": "user", "content": "What's the weather in London and who is the current UK Prime Minister?"}]
+     openai_tools_json = tool_manager.list_tools(format=ToolFormat.OPENAI)
+
+     response = client.chat.completions.create(
+         model="gpt-4o-mini", # Or your preferred model
+         messages=messages,
+         tools=openai_tools_json,
+         tool_choice="auto"
+     )
+     response_message = response.choices[0].message
+    ```
+
+4.  **Check for Tool Calls in the Response:**
+    The `response_message` from OpenAI might contain `tool_calls`. If it does, the model wants to invoke one or more of your tools.
+
+    ```python
+     tool_calls = response_message.tool_calls
+     if tool_calls:
+         messages.append(response_message) # Add AI's turn to messages
+         # ... process tool calls ...
+    ```
+
+5.  **Execute Tool Calls using `ToolManager`:**
+    For each tool call requested by the model:
+    *   Get the function name and arguments.
+    *   Use your `ToolManager` instance's `call_tool` method to execute the actual MCP tool.
+    *   Append the results of the tool calls as new messages with `role: "tool"`.
+
+    ```python
+    import json
+
+    async def process_tool_calls(tool_calls, messages, tool_manager):
+    # Iterate through each tool call received
+    for tool_call in tool_calls:
+        # Extract the function name from the tool call
+        function_name = tool_call.function.name
+        # Parse the function arguments from a JSON string into a Python dictionary
+        function_args = json.loads(tool_call.function.arguments)
+
+        # Call the specified tool using the tool manager
+        # Await the call_tool method as it is an asynchronous operation
+        function_response = await tool_manager.call_tool(
+            name=function_name,
+            arguments=function_args
+        )
+
+        # Append the tool's response to the messages list
+        messages.append({
+            "tool_call_id": tool_call.id,  # Include the ID of the tool call
+            "role": "tool",  # Specify the role as 'tool'
+            "name": function_name,  # Include the name of the function that was called
+            "content": str(function_response), # Ensure the content is a string representation of the response
+        })
+
+    ```
+
+6.  **Send Results Back to OpenAI (Optional):**
+    After executing all tool calls, you can send the updated list of messages (including the tool responses) back to the OpenAI model to get a final summarized response from the AI.
+
+    ```python
+     second_response = client.chat.completions.create(
+         model="gpt-4o-mini",
+         messages=messages
+     )
+     final_ai_response = second_response.choices[0].message.content
+     print(final_ai_response)
+    ```
+
+This process allows you to leverage OpenAI's powerful models for reasoning and tool selection, while Universal MCP handles the actual execution of the tools and interaction with external services. The `examples/github.py` script provides a practical demonstration of this flow.
+
+```
+[1] tools/adapters.py - convert_tool_to_openai_tool, ToolFormat
+[2] exmples.xml - examples/github.py
+```

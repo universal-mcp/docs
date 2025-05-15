@@ -1,0 +1,138 @@
+---
+title: Generating and Publishing a Blog Post with Langchain
+---
+
+This advanced example demonstrates an AI agent that can research a topic, generate a blog post, create a cover image, and publish it to Hashnode. It combines tools from `hashnode`, `perplexity` (for research), and `falai` (for image generation) MCP applications. This is based on `examples/blog.py`. [1]
+
+## Objective
+
+Create an agent that, given a topic and Hashnode publication ID:
+1.  Researches the topic using a research tool (Perplexity).
+2.  Generates blog post content (title, subtitle, main content, tags) in Markdown format, adhering to specific writing guidelines.
+3.  Generates a suitable cover image for the blog post.
+4.  Publishes the generated blog post with the cover image to the specified Hashnode publication.
+
+## Steps
+
+1.  **Set up Applications:**
+    Load `hashnode`, `perplexity`, and `falai` applications.
+
+    ```python
+    from universal_mcp.applications import app_from_slug
+    from universal_mcp.integrations import AgentRIntegration
+
+    def get_application(name: str):
+        AppClass = app_from_slug(name)
+        integration = AgentRIntegration(name) # Assumes integrations are set up on AgentR
+        instance = AppClass(integration=integration)
+        return instance
+
+    blog_app = get_application("hashnode")
+    research_app = get_application("perplexity")
+    image_app = get_application("falai") # Assuming fal.ai is wrapped as 'falai'
+    ```
+
+2.  **Initialize LLM and ToolManager:**
+    ```python
+    import os
+    from langchain_openai import ChatOpenAI
+    from universal_mcp.tools import ToolManager
+    from universal_mcp.tools.adapters import ToolFormat
+
+    model_name = os.environ.get("OPEN_AI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name)
+    tool_manager = ToolManager()
+    ```
+
+3.  **Register Tools:**
+    Register all tools from the `blog_app` (Hashnode) and `research_app` (Perplexity). For the `image_app`, explicitly add its `generate_image` tool with a clear name.
+
+    ```python
+    tool_manager.register_tools_from_app(blog_app)
+    tool_manager.register_tools_from_app(research_app)
+    # Assuming image_app has a 'generate_image' method
+    tool_manager.add_tool(image_app.generate_image, name="generate_cover_image")
+    ```
+
+4.  **Get Tools in Langchain Format:**
+    ```python
+    langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
+    ```
+
+5.  **Create the Langchain Agent:**
+    ```python
+    from langgraph.prebuilt import create_react_agent
+
+    agent_executor = create_react_agent(
+        llm,
+        tools=langchain_tools,
+        prompt="You are a helpful assistant that can use tools to research, write, and publish blog posts."
+    )
+    ```
+
+6.  **Define the Detailed Agent Task Prompt:**
+    This prompt is crucial as it guides the LLM through the entire content creation and publishing workflow.
+
+    ```python
+    agent_task_prompt_template = """
+    Generate a blog post for given topic for agentr in a formal tone.
+    Use perplexity to research for the topic and put up to date content.
+    Once done publish the post to hashnode blog with publication id: {publication_id}
+
+    Specifically, provide:
+    - Slug (a concise, URL-friendly version of the title...)
+    - Title: Craft a catchy, SEO-friendly title...
+    - Subtitle
+    - Content (the full blog post...written in the specified tone...)
+    - Tags (a comma-separated list of relevant keywords...). Always include "blog"
+
+    ## Writing Guidelines:
+    - Divide the content into clear sections...
+    - Use short paragraphs...
+    - Include practical examples...
+    - Add 1-2 external links...
+    - Conclusion: Summarize key points...
+
+    Tone: Keep it conversational, professional, and approachable. Length: Aim for 800-1,500 words.
+    Markdown Formatting: Use proper Markdown syntax...
+    Cover Image: Generate a cover image for the blog. Use landscape format. Use the 'generate_cover_image' tool.
+
+    Topic: {topic}
+    """
+    ```
+
+7.  **Invoke the Agent:**
+    ```python
+    async def main():
+        # ... (LLM, ToolManager, App setup) ...
+
+        publication_id = input("Enter the Hashnode publication id: ")
+        topic = input("Enter the topic for the blog post: ")
+
+        filled_prompt = agent_task_prompt_template.format(
+            publication_id=publication_id,
+            topic=topic
+        )
+
+        result = await agent_executor.ainvoke(
+            input={"messages": [{"role": "user", "content": filled_prompt}]}
+        )
+        print(result["messages"][-1].content)
+
+    import asyncio
+    asyncio.run(main())
+    ```
+
+## How It Works
+
+The agent will execute a complex sequence:
+1.  Use a Perplexity tool (e.g., `perplexity_search`) to research the given topic.
+2.  The LLM synthesizes this research and its instructions to draft the blog post content (title, slug, content, tags).
+3.  It then calls the `generate_cover_image` tool (from the `falai` app) with a prompt derived from the blog topic/title to get an image URL.
+4.  Finally, it uses a Hashnode tool (e.g., `hashnode_publish_post`), providing the generated Markdown content, title, slug, tags, and the cover image URL to publish the post.
+
+This example highlights the power of Universal MCP in enabling agents to perform sophisticated, multi-step tasks by orchestrating tools from completely different services.
+
+```
+ exmples.xml - examples/blog.py
+```

@@ -1,0 +1,190 @@
+---
+title: Building a GitHub Interaction Agent with OpenAI Tools
+---
+
+# Example Guide: 
+
+This guide demonstrates how to create an AI agent that can perform actions on GitHub, such as starring a repository, using OpenAI's tool-calling feature and Universal MCP tools. This example is based on `examples/github.py`. [1]
+
+## Objective
+
+Build an agent that can, when asked to "Star the repository username/repo_name":
+1.  Understand the request involves a GitHub action.
+2.  Identify the correct GitHub tool (e.g., `github_star_repository`).
+3.  Extract the repository name.
+4.  Call the tool to star the repository.
+5.  Confirm the action to the user.
+
+## Steps
+
+1.  **Set up the GitHub Application:**
+    Load the `github` application from Universal MCP, likely using `app_from_slug` and configuring its integration (e.g., `AgentRIntegration` for credentials managed by AgentR).
+
+    ```python
+    from universal_mcp.applications import app_from_slug
+    from universal_mcp.integrations import AgentRIntegration
+    from universal_mcp.tools import ToolManager
+
+    async def setup_github_tools() -> ToolManager:
+        GitHubAppClass = app_from_slug("github")
+        # Assumes 'github' integration is configured on AgentR
+        integration = AgentRIntegration(name="github")
+        app_instance = GitHubAppClass(integration=integration)
+
+        tool_manager = ToolManager()
+        # Register specific tools or tools by tags
+        tool_manager.register_tools_from_app(
+            app_instance,
+            # Example: tool_names=["github_star_repository"],
+            tags=["repository"] # Assuming 'star_repository' has this tag
+        )
+        return tool_manager
+    ```
+    *Self-note: The example `github.py` uses `tool_names=["github_star_repository"]` and `tags=["repository"]`. The actual available tools and their tags depend on the `github` app's implementation.*
+
+2.  **Initialize OpenAI Client and ToolManager:**
+    ```python
+    import os
+    import json
+    from openai import OpenAI
+
+    # In github.py, client is initialized globally
+     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+     tool_manager would be obtained from setup_github_tools()
+     tool_manager = await setup_github_tools()
+    ```
+
+3.  **Get Tools in OpenAI Format:**
+    Retrieve the list of tools formatted for the OpenAI API.
+
+    ```python
+    # openai_tools_json = tool_manager.list_tools(format="openai")
+    ```
+
+4.  **Prepare Conversation and Make Initial API Call:**
+    ```python
+    # Define the initial conversation messages for the chat model
+    messages = [
+        # System message to set the persona and capabilities of the assistant
+        {"role": "system", "content": "You are a helpful assistant that can use tools."},
+        # User message containing the request to the assistant, including the target repository
+        {"role": "user", "content": "Star the repository manojbajaj95/config"} # Example repository to be acted upon
+    ]
+
+    # Create a chat completion request using the OpenAI client
+    response = client.chat.completions.create(
+        # Specify the model to use for the completion, defaulting to gpt-4o if not in environment variables
+        model=os.environ.get("OPEN_AI_MODEL", "gpt-4o"),
+        # Pass the conversation history (messages) to the model
+        messages=messages,
+        # Provide the list of available tools the model can use (assuming openai_tools_json is defined)
+        tools=openai_tools_json,
+        # Set tool_choice to "auto" to allow the model to decide whether to call a tool or respond directly
+        tool_choice="auto"
+    )
+    # Extract the message from the first choice in the response
+    response_message = response.choices[0].message # Access the first choice's message
+    ```
+
+5.  **Handle Tool Calls:**
+    If `response_message.tool_calls` exists, iterate through them, execute the tools using `tool_manager.call_tool`, and append results.
+
+    ```python
+    # Import necessary libraries
+    import json
+    import os
+    import asyncio
+    from openai import OpenAI # Assuming you have the openai library installed
+
+    # Define the main asynchronous function
+    async def main():
+        # Setup the GitHub tools using a tool manager (assuming setup_github_tools is defined elsewhere)
+        tool_manager = await setup_github_tools()
+        # Get the list of available tools in OpenAI format
+        openai_tools_json = tool_manager.list_tools(format="openai")
+        # Initialize the OpenAI client
+        openai_client = OpenAI()
+
+        # Define the repository to be starred (example)
+        repo_to_star = "manojbajaj95/config"
+        # Initialize the conversation messages with a system message and a user query
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"Star the repository {repo_to_star}"}
+        ]
+
+        # Create a chat completion request to the OpenAI API
+        # Include the messages, available tools, and set tool_choice to "auto" to let the model decide
+        response = openai_client.chat.completions.create(
+            model=os.environ.get("OPEN_AI_MODEL", "gpt-4o"), # Use model from environment variable or default
+            messages=messages,
+            tools=openai_tools_json,
+            tool_choice="auto" # Allow the model to automatically choose a tool
+        )
+        # Extract the response message from the completion
+        response_message = response.choices[0].message # Access the first choice's message
+
+        # Check if the response contains tool calls
+        if response_message.tool_calls:
+            # Append the AI's response (containing the tool call) to the messages list
+            messages.append(response_message)
+
+            # Iterate through each tool call in the response
+            for tool_call in response_message.tool_calls:
+                # Extract the function name and arguments from the tool call
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+
+                # Note: Depending on the tool's expected arguments and the LLM's output,
+                # you might need to adapt function_args here.
+                # The example assumes the arguments from the LLM match the tool's requirements.
+
+                # Call the actual tool using the tool manager
+                tool_output = await tool_manager.call_tool(
+                    name=function_name,
+                    arguments=function_args
+                )
+
+                # Append the tool's output to the messages list
+                messages.append({
+                    "tool_call_id": tool_call.id, # Associate the output with the tool call
+                    "role": "tool", # Specify the role as 'tool'
+                    "name": function_name, # Include the name of the tool that was called
+                    "content": str(tool_output) # Convert the tool's result to a string
+                })
+                # Print confirmation and the tool's result
+                print(f"Tool {function_name} called. Result: {tool_output}")
+
+            # After tool execution, get a final response from the AI based on the updated messages
+            second_response = openai_client.chat.completions.create(
+                model=os.environ.get("OPEN_AI_MODEL", "gpt-4o"),
+                messages=messages # Include the tool call and its output in the messages
+            )
+            # Print the final response from the AI
+            print(second_response.choices[0].message.content) # Access the first choice's message
+        else:
+            # If no tool call was made, print the initial response content
+            print(response_message.content)
+
+    # Run the main asynchronous function
+    if __name__ == "__main__":
+        asyncio.run(main())
+
+    ```
+    The `github.py` example directly processes the tool call and prints the result without necessarily sending it back to the model for a final summarization, but the structure for doing so is shown above. [1]
+
+## How It Works
+
+*   The user's request ("Star the repository...") is sent to the OpenAI model along with the definitions of available GitHub tools (obtained from MCP).
+*   The OpenAI model identifies that the `github_star_repository` tool is appropriate and determines the arguments (e.g., `owner` and `repo`, or a combined `repository_full_name` depending on the tool's schema).
+*   The application code receives the `tool_calls` object.
+*   It uses the `function_name` and `function_arguments` to invoke the corresponding MCP tool via `tool_manager.call_tool()`.
+*   The `github` MCP Application handles the actual API interaction with GitHub.
+*   The result of the tool call is then processed (either printed or sent back to the LLM for a more conversational response).
+
+This demonstrates how to integrate Universal MCP with OpenAI's tool-calling capabilities, enabling agents to interact with services like GitHub in a natural language-driven way.
+
+```
+ exmples.xml - examples/github.py
+```

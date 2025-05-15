@@ -1,0 +1,102 @@
+---
+title: Building a Simple Calculator Agent with Langchain
+---
+
+This guide demonstrates how to build a basic AI agent that can perform calculations using a custom tool, leveraging Langchain and Universal MCP. This example is based on `examples/langraph.py`.
+
+## Objective
+
+Create an agent that can answer questions like "What is 2 + 2?".
+
+## Steps
+
+1.  **Define the Calculator Tool:**
+    First, we define a simple Python function that will perform the calculation. This function will be our custom tool.
+
+    ```python
+    from typing import Annotated
+    from loguru import logger
+
+    async def calculate(s: Annotated[str, "The expression to calculate"]) -> int:
+        """
+        Calculate the result of the expression.
+        Args:
+            s: A string containing a mathematical expression to evaluate
+        Returns:
+            The integer result of the calculation
+        """
+        logger.info(f"Calculating {s}")
+        return eval(s)
+    ```
+    Note the type hints and docstring, which Universal MCP will use to generate metadata for the tool.
+
+2.  **Set up LLM and ToolManager:**
+    Initialize your preferred LLM (e.g., `ChatOpenAI`) and the `ToolManager`.
+
+    ```python
+    import os
+    from langchain_openai import ChatOpenAI
+    from universal_mcp.tools import ToolManager
+    from universal_mcp.tools.adapters import ToolFormat
+
+    model_name = os.environ.get("OPEN_AI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name)
+
+    tool_manager = ToolManager()
+    ```
+
+3.  **Register the Calculator Tool:**
+    Add the `calculate` function to the `ToolManager`.
+
+    ```python
+    tool_manager.add_tool(calculate, name="calculate")
+    ```
+
+4.  **Get Tools in Langchain Format:**
+    Retrieve the list of tools in a format compatible with Langchain.
+
+    ```python
+    langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
+    ```
+
+5.  **Create the Langchain Agent:**
+    We'll use the `create_react_agent` from `langgraph.prebuilt`.
+
+    ```python
+    from langgraph.prebuilt import create_react_agent
+
+    agent_executor = create_react_agent(
+        llm,
+        tools=langchain_tools,
+        prompt="You are a helpful assistant that can use tools to help the user. If you need to calculate something, use the 'calculate' tool."
+    )
+    ```
+
+6.  **Invoke the Agent:**
+    Now, you can ask the agent a question that requires calculation.
+
+    ```python
+    async def main():
+        # ... (previous setup code) ...
+        result = await agent_executor.ainvoke(
+            input={"messages": [{"role": "user", "content": "What is 2 + 2?"}]}
+        )
+        print(result["messages"][-1].content)
+
+    import asyncio
+    asyncio.run(main())
+    ```
+
+## How It Works
+
+*   The user asks "What is 2 + 2?".
+*   The Langchain ReAct agent, prompted to use tools, identifies that the "calculate" tool (whose description was generated from its docstring) is suitable.
+*   It invokes the "calculate" tool with the argument `s="2 + 2"`.
+*   The `calculate` function (managed by Universal MCP's `Tool` wrapper) executes and returns `4`.
+*   The agent receives the result and formulates the final answer, e.g., "The result is 4."
+
+This simple example illustrates the core workflow: defining a function, registering it as an MCP tool, and providing it to a Langchain agent to extend its capabilities. More complex agents will follow a similar pattern but with tools from various MCP `Applications`.
+
+```
+[1] exmples.xml - examples/langraph.py
+```
