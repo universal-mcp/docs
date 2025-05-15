@@ -100,15 +100,6 @@
               "guides/integrations-credentials/leveraging-agentr-integration",
               "guides/integrations-credentials/secure-credential-storage"
             ]
-          },
-          {
-            "group": "Advanced Features and CLI Usage",
-            "pages": [
-              "guides/advanced-cli/generating-api-clients-from-openapi",
-              "guides/advanced-cli/automatic-docstring-generation",
-              "guides/advanced-cli/initializing-new-mcp-project",
-              "guides/advanced-cli/in-depth-server-types"
-            ]
           }
         ]
       }
