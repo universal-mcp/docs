@@ -1,0 +1,121 @@
+---
+title: Automating Tweet Interactions with Langchain
+---
+
+This guide illustrates how to create an AI agent capable of liking a specific tweet on behalf of the current user. It uses tools from the Universal MCP `twitter` application. The example is based on [`examples/like_tweet.py`](https://github.com/universal-mcp/examples/blob/master/agents/like_tweet.py).
+
+## Objective
+
+Develop an agent that can:
+1.  Retrieve the current user's Twitter ID.
+2.  Extract a tweet ID from a given tweet URL or ID.
+3.  Like the specified tweet as the current user.
+4.  Confirm the action or report errors.
+
+## Steps
+
+1.  **Set up the Twitter Application:**
+    Load the `twitter` application using `app_from_slug` and configure its integration (e.g., `AgentRIntegration`).
+
+    ```python
+    from universal_mcp.applications import app_from_slug
+    from universal_mcp.integrations import AgentRIntegration
+
+    def get_application(name: str):
+        AppClass = app_from_slug(name)
+        integration = AgentRIntegration(name) # Assumes 'twitter' integration on AgentR
+        instance = AppClass(integration=integration)
+        return instance
+
+    twitter_app = get_application("twitter")
+    ```
+
+2.  **Initialize LLM and ToolManager:**
+    ```python
+    import os
+    from langchain_openai import ChatOpenAI
+    from universal_mcp.tools import ToolManager
+    from universal_mcp.tools.adapters import ToolFormat
+
+    model_name = os.environ.get("OPEN_AI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name)
+    tool_manager = ToolManager()
+    ```
+
+3.  **Register Specific Twitter Tools:**
+    Instead of registering all tools from the Twitter app, we'll explicitly add the ones needed for this task. This demonstrates finer-grained tool selection.
+
+    ```python
+     Assuming twitter_app has methods like:
+     users_id_like(self, id, tweet_id)
+     users_id_unlike(self, id, tweet_id)
+     find_my_user(self) -> returns {"data": {"id": "USER_ID", ...}}
+
+    tool_manager.add_tool(twitter_app.users_id_like, name="like_tweet")
+    tool_manager.add_tool(twitter_app.users_id_unlike, name="unlike_tweet") # Not used in this specific task
+    tool_manager.add_tool(twitter_app.find_my_user, name="find_my_user_id")
+    ```
+    *Self-note: The actual method names in `twitter_app` might differ; this is illustrative based on the `like_tweet.py` example's tool naming.*
+
+4.  **Get Tools in Langchain Format:**
+    ```python
+    langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
+    ```
+
+5.  **Create the Langchain Agent:**
+    ```python
+    from langgraph.prebuilt import create_react_agent
+
+    agent_executor = create_react_agent(
+        llm,
+        tools=langchain_tools,
+        prompt="You are a helpful assistant that can use tools to help the user."
+    )
+    ```
+
+6.  **Define the Agent's Task Prompt:**
+    This prompt instructs the agent on the steps to like a tweet.
+
+    ```python
+    agent_task_prompt_template = """
+    You are a helpful assistant. Your task is to like a specific tweet on behalf of the current user.
+
+    Steps:
+    1. Retrieve the current user's Twitter user ID using the 'find_my_user_id' tool.
+    2. Given the tweet URL or tweet ID ({tweet_id_or_url}), extract the tweet ID if necessary.
+    3. Use the 'like_tweet' tool (which requires the user ID and tweet ID) to like the tweet as the current user.
+    4. Confirm to the user that the tweet has been liked, or report any errors.
+
+    Only perform the like action; do not reply, retweet, or perform any other operation.
+    """
+    ```
+
+7.  **Invoke the Agent:**
+    Get the tweet ID/URL from the user and run the agent.
+
+    ```python
+    async def main():
+        # ... (LLM, ToolManager, App setup) ...
+
+        tweet_id_or_url = input("Enter the tweet id / url: ")
+
+        filled_prompt = agent_task_prompt_template.format(tweet_id_or_url=tweet_id_or_url)
+
+        result = await agent_executor.ainvoke(
+            input={"messages": [{"role": "user", "content": filled_prompt}]}
+        )
+        print(result["messages"][-1].content)
+
+    import asyncio
+    asyncio.run(main())
+    ```
+
+## How It Works
+
+*   The agent first calls `find_my_user_id` to get the necessary user ID.
+*   The LLM extracts the tweet ID from the input `tweet_id_or_url`.
+*   It then calls the `like_tweet` tool, passing the retrieved user ID and the extracted tweet ID.
+*   The `twitter_app.users_id_like` method (aliased as `like_tweet`) interacts with the Twitter API.
+*   The agent reports the success or failure of the operation.
+
+This example shows how an agent can perform a sequence of tool calls, using the output of one tool (user ID) as input for another, to accomplish a task.

@@ -1,0 +1,87 @@
+---
+title: Exposing Application Tools
+---
+
+For the tools defined within your custom `Application` classes to be discoverable and usable by AI agents, they need to be explicitly exposed. This is primarily achieved through the `list_tools()` method of your application and the `ToolManager`.
+
+## The `list_tools()` Method
+
+Every class that inherits from `BaseApplication` (including `APIApplication` and `GraphQLApplication`) must implement the `list_tools()` method.
+
+This method should return a list of the callable methods within that application class that you intend to make available as tools.
+
+**Example:**
+
+```python
+from universal_mcp.applications import APIApplication
+from typing import Callable, List
+
+class MyWebApp(APIApplication):
+    def __init__(self, integration=None):
+        super().__init__(name="mywebapp", integration=integration)
+        self.base_url = "https://api.mywebapp.com"
+
+    def get_item(self, item_id: str) -> dict:
+        """Fetches a specific item by its ID."""
+        # ... implementation ...
+        return self._get(f"/items/{item_id}").json()
+
+    def create_item(self, name: str, description: str) -> dict:
+        """Creates a new item."""
+        # ... implementation ...
+        payload = {"name": name, "description": description}
+        return self._post("/items", data=payload).json()
+
+    def _internal_helper_method(self):
+        # This method is not intended to be a tool
+        pass
+
+    def list_tools(self) -> List[Callable]:
+        """Lists all tools available from MyWebApp."""
+        return [
+            self.get_item,
+            self.create_item
+            # self._internal_helper_method is NOT included
+        ]
+```
+
+In this example:
+*   `get_item` and `create_item` are intended as tools.
+*   `_internal_helper_method` is a private/internal helper and is not included in the list returned by `list_tools()`, so it won't be exposed as a tool.
+
+## Tool Registration via `ToolManager`
+
+The `ToolManager` is responsible for collecting these exposed tool methods and transforming them into fully-fledged `Tool` objects with all the necessary metadata (name, description, parameters, etc.).
+
+When you have an instance of your application, you use the `ToolManager`'s `register_tools_from_app()` method:
+
+```python
+from universal_mcp.tools import ToolManager
+# Assuming MyWebApp class is defined as above and instantiated
+my_web_app_instance = MyWebApp(integration=my_integration)
+
+tool_manager = ToolManager()
+tool_manager.register_tools_from_app(app=my_web_app_instance)
+```
+
+The `register_tools_from_app` method will:
+1.  Call the `app.list_tools()` method to get the list of callable functions.
+2.  For each function, it creates a `Tool` instance using `Tool.from_function()`.
+3.  It automatically prefixes the tool name with the application's name (e.g., `mywebapp_get_item`) to avoid naming conflicts if you register tools from multiple applications.
+4.  It also adds the application's name as a tag to the tool for easier filtering.
+5.  It stores these `Tool` objects internally.
+
+You can also specify `tool_names` or `tags` in `register_tools_from_app` to selectively register only a subset of tools from an application.
+
+## How AI Agents Discover Tools
+
+Once tools are registered in the `ToolManager`, AI agent frameworks (like Langchain or OpenAI Functions) can query the `ToolManager` to get a list of available tools in a compatible format (e.g., OpenAI JSON schema). The `ToolManager.list_tools(format="openai")` or `ToolManager.list_tools(format="langchain")` methods are used for this.
+
+The descriptions and parameter schemas generated for each tool are critical for the AI agent to understand:
+*   **What each tool does.**
+*   **When it should be used.**
+*   **What inputs it requires.**
+
+By correctly implementing `list_tools()` in your applications and using `ToolManager` to register them, you make your application's functionalities available to AI agents in a structured and discoverable manner.
+
+Refer to [`tools/manager.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/manager.py) for more information

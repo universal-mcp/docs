@@ -1,0 +1,83 @@
+---
+title: Configuring Your Server
+---
+
+Once Universal MCP is installed, the next step is to configure your server. This is primarily done through a configuration file (commonly `local_config.json` or a custom-named JSON file) or by setting environment variables that map to the `ServerConfig` model.
+
+## Understanding `ServerConfig`
+
+The `ServerConfig` Pydantic model (found in [`config.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/config.py)) is the backbone of your server's setup. It defines crucial aspects of how your server behaves. Here are some of ahe key parameters:
+
+*   **`name`**: A descriptive name for your MCP server (e.g., "My Development MCP").
+*   **`description`**: A brief description of your server.
+*   **`type`**: Specifies the server deployment type. Common values:
+    *   `"local"`: A server that loads applications based on the local configuration file. Ideal for development and self-hosting.
+    *   `"agentr"`: A server that connects to the AgentR platform to fetch app configurations and manage integrations.
+*   **`transport`**: The communication protocol the server will use. Common values:
+    *   `"stdio"`: Standard input/output, often used for local CLI tools.
+    *   `"sse"`: Server-Sent Events, suitable for web-based clients (like the Playground).
+    *   `"http"`: A standard HTTP server.
+*   **`port`**: The network port on which the server will listen (e.g., `8005`). This is applicable for `sse` and `http` transports.
+*   **`apps`**: (Primarily for `LocalServer`) A list of `AppConfig` objects, defining which applications the server should load and how they are configured.
+    *   Each `AppConfig` specifies the `name` of the application (slug) and can include an `integration` block.
+*   **`store`**: (Optional) A `StoreConfig` object defining the default credential storage mechanism (e.g., `memory`, `environment`, `keyring`).
+*   **`api_key`**: (Primarily for `AgentRServer`) Your AgentR API key if you're using the `agentr` server type.
+*   **`debug`**: Boolean to enable debug mode (`True` or `False`).
+*   **`log_level`**: Logging level (e.g., "INFO", "DEBUG").
+
+## Creating a Server Configuration File
+
+For a `LocalServer`, you typically create a JSON file (e.g., `local_config.json`) that defines your server's settings.
+
+**Example `local_config.json` for a `LocalServer`:**
+
+```json
+{
+  "name": "MyFirstMCP Server",
+  "description": "A local MCP server for learning and development.",
+  "type": "local",
+  "transport": "sse",
+  "port": 8005,
+  "store": {
+    "name": "my_mcp_store",
+    "type": "memory"
+  },
+  "apps": [
+    {
+      "name": "zenquotes"
+    },
+    {
+      "name": "tavily",
+      "integration": {
+        "name": "TAVILY_API_KEY", // This will be the key used in the store
+        "type": "api_key",
+        "store": {
+          "type": "environment" // Tells the integration to look for TAVILY_API_KEY env var
+        }
+      }
+    }
+    // Add more applications you want to expose
+  ]
+}
+```
+
+In this example:
+*   We're setting up a `LocalServer` named "MyFirstMCP Server".
+*   It will use Server-Sent Events (`sse`) on port `8005`.
+*   It uses an in-`memory` store for credentials (credentials will be lost when the server stops).
+*   It's configured to load two applications:
+    *   `zenquotes`: This app might not require explicit integration if it's a public API or configured within its package.
+    *   `tavily`: This app uses an `api_key` integration. The `integration` block specifies that the API key named `TAVILY_API_KEY` should be sourced from an `environment` variable store (meaning it will look for an environment variable named `TAVILY_API_KEY`).
+
+## Server Types and Configuration
+
+*   **`LocalServer`**:
+    *   Relies heavily on the `apps` array within your configuration file to know which applications (and their tools) to load.
+    *   You define integrations (like API keys) directly within the `AppConfig` for each app.
+*   **`AgentRServer`**:
+    *   Typically fetches its application configurations from the AgentR platform using your `AGENTR_API_KEY`.
+    *   Integrations are often managed through the AgentR platform itself.
+
+For these guides, we will primarily focus on the `LocalServer` as it's excellent for development and understanding the core mechanics. Refer to [`servers/server.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/servers/server.py) for more information.
+
+With your configuration file ready, you're set to launch the server!

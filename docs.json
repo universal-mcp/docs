@@ -49,6 +49,69 @@
       {
         "tab": "API Reference",
         "openapi": "openapi.json"
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Introduction to Universal MCP",
+            "pages": [
+              "guides/introduction/what-is-universal-mcp",
+              "guides/introduction/core-concepts-revisited",
+              "guides/introduction/why-choose-universal-mcp"
+            ]
+          },
+          {
+            "group": "Getting Started: Your First MCP Server",
+            "pages": [
+              "guides/getting-started/installation",
+              "guides/getting-started/configuring-your-server",
+              "guides/getting-started/running-the-server"
+            ]
+          },
+          {
+            "group": "Working with Applications and Tools",
+            "pages": [
+              "guides/applications-tools/understanding-applications",
+              "guides/applications-tools/loading-and-using-applications",
+              "guides/applications-tools/understanding-tools",
+              "guides/applications-tools/exposing-application-tools",
+              "guides/applications-tools/creating-and-registering-custom-tools"
+            ]
+          },
+          {
+            "group": "Building AI Agents with MCP Tools",
+            "pages": [
+              "guides/building-agents/introduction",
+              {
+                "group": "Langgraph Agents",
+                "pages": [
+                  "guides/building-agents/using-tools-with-langchain",
+                  "guides/building-agents/example-calculator-agent",
+                  "guides/building-agents/example-reddit-summarizer",
+                  "guides/building-agents/example-tweet-interactions",
+                  "guides/building-agents/example-blog-generator"
+                ]
+              },
+              {
+                "group": "OpenAI Agents",
+                "pages": [
+                  "guides/building-agents/using-tools-with-openai-functions",
+                  "guides/building-agents/example-github-agent"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Managing Integrations and Credentials",
+            "pages": [
+              "guides/integrations-credentials/understanding-integrations",
+              "guides/integrations-credentials/configuring-api-key-integration",
+              "guides/integrations-credentials/leveraging-agentr-integration",
+              "guides/integrations-credentials/secure-credential-storage"
+            ]
+          }
+        ]
       }
     ],
     "global": {
@@ -57,6 +120,11 @@
           "anchor": "Get Started",
           "href": "https://agentr.dev/quickstart",
           "icon": "rocket"
+        },
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/universal-mcp/universal-mcp",
+          "icon": "github"
         },
         {
           "anchor": "Community",

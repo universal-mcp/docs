@@ -1,0 +1,89 @@
+---
+title: Configuring API Key Integration
+---
+
+The `ApiKeyIntegration` is designed for services that authenticate using a simple API key. It handles the retrieval of this key, typically from a configured [Store](/guides/integrations-credentials/secure-credential-storage), and makes it available to the `Application`.
+
+## How `ApiKeyIntegration` Works
+
+When an `Application` configured with an `ApiKeyIntegration` needs to make an authenticated request, the `APIApplication`'s `_get_headers()` method (or similar for `GraphQLApplication`) will call `integration.get_credentials()`.
+
+The `ApiKeyIntegration` then:
+1.  Attempts to retrieve the API key from its associated `store` using its `name` as the key.
+2.  If the key is found, it's returned, typically in a dictionary like `{"api_key": "your_actual_api_key"}`.
+3.  The `Application` then usually includes this as a Bearer token in the `Authorization` header (e.g., `Authorization: Bearer your_actual_api_key`).
+4.  If the key is not found in the store, a `NotAuthorizedError` is raised, which includes instructions (from `authorize()`) on how to set the API key.
+
+## Initializing `ApiKeyIntegration`
+
+You initialize `ApiKeyIntegration` with a `name` and a `Store` instance:
+
+```python
+from universal_mcp.integrations import ApiKeyIntegration
+from universal_mcp.stores import EnvironmentStore, MemoryStore, KeyringStore
+
+# Example 1: Using EnvironmentStore
+# This expects an environment variable named "MY_SERVICE_API_KEY" to exist.
+env_store = EnvironmentStore()
+service_env_integration = ApiKeyIntegration(name="MY_SERVICE_API_KEY", store=env_store)
+
+# Example 2: Using MemoryStore (for testing, credentials lost on exit)
+mem_store = MemoryStore()
+# You'd typically set the key in the store first for MemoryStore if not prompting:
+mem_store.set("TEST_SERVICE_API_KEY", "test_key_123")
+service_mem_integration = ApiKeyIntegration(name="TEST_SERVICE_API_KEY", store=mem_store)
+
+# Example 3: Using KeyringStore (securely uses system keychain)
+# 'app_name_for_keyring' will be used as the service name in the keychain.
+keyring_store = KeyringStore(app_name="my_mcp_credentials")
+service_keyring_integration = ApiKeyIntegration(name="SECURE_SERVICE_API_KEY", store=keyring_store)
+# To use this, the key "SECURE_SERVICE_API_KEY" must be set in the "my_mcp_credentials" service in your keychain.
+```
+
+## API Key Name Sanitization
+
+The `ApiKeyIntegration` uses a helper function `sanitize_api_key_name` when it's initialized. This function ensures consistency in how API key names are formatted, typically by converting the provided `name` to uppercase and appending `_API_KEY` if it's not already in that format.
+
+For example:
+*   `"myservice"` becomes `"MYSERVICE_API_KEY"`
+*   `"my_service_key"` becomes `"MY_SERVICE_KEY_API_KEY"`
+*   `"ANOTHER_API_KEY"` remains `"ANOTHER_API_KEY"`
+
+This sanitized name is the actual key that will be used when interacting with the `Store`. So, if you initialize with `ApiKeyIntegration(name="tavily", store=EnvironmentStore())`, it will look for an environment variable named `TAVILY_API_KEY`.
+
+## Configuration in `local_config.json`
+
+When defining an `ApiKeyIntegration` within your server configuration file for a `LocalServer`, you'd structure it like this:
+
+```json
+{
+  // ... server config ...
+  "apps": [
+    {
+      "name": "tavily-search", // App slug
+      "integration": {
+        "name": "TAVILY", // Name given to ApiKeyIntegration
+        "type": "api_key", // Specifies ApiKeyIntegration
+        "store": {
+          "type": "environment" // Store type, e.g., look for TAVILY_API_KEY env var
+        }
+      }
+    }
+  ]
+}
+```
+When the `LocalServer` loads this `AppConfig`, `integration_from_config` will be called, which in turn instantiates `ApiKeyIntegration(name="TAVILY", store=EnvironmentStore())`.
+
+## Setting Credentials
+
+While `ApiKeyIntegration` primarily retrieves credentials, if you need to set them programmatically (especially for `MemoryStore` or `KeyringStore` during setup), you can use the store's `set` method:
+
+```python
+# For the MemoryStore example above:
+mem_store.set("TEST_SERVICE_API_KEY", "new_api_key_value")
+service_mem_integration.api_key = "new_api_key_value" # also works and uses the store
+
+# For KeyringStore:
+keyring_store.set("SECURE_SERVICE_API_KEY", "your_secure_key_from_user_input")
+```
+The `ApiKeyIntegration.authorize()` method provides a message guiding the user to set the API key in the store if it's missing.

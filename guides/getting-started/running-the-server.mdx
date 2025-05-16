@@ -1,0 +1,59 @@
+---
+title: Running the Server
+---
+
+Once you have Universal MCP installed and your server configuration file prepared (e.g., `local_config.json`), you can start the server using the `universal_mcp` command-line interface (CLI).
+
+## The `run` Command
+
+The primary command to start your MCP server is:
+
+```bash
+universal_mcp run --config path/to/your/config.json
+```
+
+Replace `path/to/your/config.json` with the actual path to your server configuration file. If your configuration file is named `local_config.json` and is in the current directory, the command simplifies to:
+
+```bash
+universal_mcp run --config local_config.json
+```
+
+If you omit the `--config` option, the server will attempt to start with default `ServerConfig` values, which might not load any specific applications unless defined via environment variables or other default mechanisms. Refer to [`cli.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/cli.py) for more information.
+
+## Verifying the Server is Running
+
+When the server starts successfully, you'll typically see log output in your terminal indicating:
+
+*   The server name and type (e.g., "MyFirstMCP Server (local)").
+*   The transport protocol and port it's listening on (e.g., "MCP SSE Server running on http://localhost:8005").
+*   Information about loaded applications and registered tools.
+
+**Example Log Output (Illustrative):**
+
+```
+INFO: Initializing server: MyFirstMCP Server (local) with store: StoreConfig(name='my_mcp_store', type='memory', path=None)
+INFO: Loading apps: [AppConfig(name='zenquotes', integration=None, actions=None), AppConfig(name='tavily', integration=IntegrationConfig(name='TAVILY_API_KEY', type='api_key', credentials=None, store=StoreConfig(name='universal_mcp', type='environment', path=None)), actions=None)]
+INFO: Using uv executable: /path/to/.cargo/bin/uv
+DEBUG: Installing package 'universal_mcp_zenquotes' with command: ...
+DEBUG: Package universal_mcp_zenquotes installed successfully
+DEBUG: Resolving app for slug 'zenquotes' → module 'universal_mcp_zenquotes.app', class 'ZenquotesApp'
+DEBUG: Loaded class '<class 'universal_mcp_zenquotes.app.ZenquotesApp'>' from module 'universal_mcp_zenquotes.app'
+DEBUG: Adding tool: zenquotes_get_random_quote
+... (logs for tavily app loading) ...
+INFO: Logging to /home/user/.universal-mcp/logs/universal-mcp_YYYYMMDD.log
+INFO: MCP SSE Server running on http://localhost:8005
+```
+
+The exact logs will vary based on your configuration, the applications you're loading, and your log level.
+
+## What Happens Now?
+
+With the server running:
+
+1.  It has loaded the applications specified in your `apps` configuration (for a `LocalServer`).
+2.  It has registered the tools (Actions) exposed by these applications with its internal `ToolManager`.
+3.  It is now listening for incoming requests (e.g., via HTTP or SSE) to list or call these tools.
+
+Your MCP server is now ready to serve tools to AI agents or other clients! In the next sections, we'll explore how to define these applications and tools, and then how to connect an AI agent to use them.
+
+To stop the server, you can usually press `Ctrl+C` in the terminal where it's running.

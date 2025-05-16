@@ -1,0 +1,27 @@
+---
+title: Why Choose Universal MCP?
+mode: "wide"
+---
+
+Universal MCP offers a range of benefits for developers looking to build AI agents that can meaningfully interact with the digital world. Here's why it stands out:
+
+*   **Seamless External System Interaction:**
+    It provides a structured and simplified way for AI models to connect to and control virtually any external system or API. This breaks down the barriers between AI logic and real-world functionalities.
+
+*   **Standardized Tooling for AI:**
+    Universal MCP standardizes how AI agents discover and use tools (Actions). This means an agent can learn to use a new tool from a new Application with minimal specific adaptation, promoting reusability and scalability.
+
+*   **Simplified API Integration:**
+    Dealing with diverse API authentication methods, request/response formats, and error handling can be complex. Universal MCP abstracts much of this complexity through its `Application` and `Integration` layers, allowing you to focus on the logic of your AI agent.
+
+*   **Extensible Framework:**
+    Designed with extensibility in mind, you can easily create new `Applications` to support custom services or proprietary APIs. The base classes (`APIApplication`, `GraphQLApplication`) provide a solid starting point.
+
+*   **Robust Credential Management:**
+    Securely managing API keys and other credentials is paramount. Universal MCP offers a flexible `Store` system (including `KeyringStore` for system keychain integration) to handle sensitive data.
+
+*   **Dynamic Tool Discovery and Management:**
+    The `ToolManager` allows for dynamic registration and listing of tools, which can be converted into formats compatible with popular AI frameworks like Langchain and OpenAI Functions. This makes it easy to equip your agents with the right capabilities.
+
+*   **Event-Driven AI with Triggers:**
+    `Triggers` enable your AI agents to become proactive, responding to real-time events from external services, leading to more dynamic and intelligent automation.

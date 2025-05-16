@@ -1,0 +1,79 @@
+---
+title: Understanding Tools
+---
+
+In the Universal MCP ecosystem, a **Tool** represents a specific, invokable capability that an AI agent can use. These tools are the bridge between the AI's reasoning and the ability to perform actions or retrieve information from the outside world via Applications.
+
+## What is a Tool?
+
+Essentially, a Tool in Universal MCP is a Python function (or a method within an Application class) that has been packaged with metadata to make it discoverable and usable by AI agents. The `Tool` class (defined in [`tools/tools.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py)) encapsulates:
+
+*   **`fn`**: The actual callable Python function that performs the work.
+*   **`name`**: A unique name for the tool.
+*   **`description`**: A human-readable summary of what the tool does (often parsed from the function's docstring). This is crucial for the AI to understand when to use the tool.
+*   **`args_description`**: Descriptions for each argument the function accepts.
+*   **`parameters`**: A JSON schema defining the expected input arguments for the tool. This allows for structured input and validation.
+*   **`fn_metadata`**: An instance of `FuncMetadata` which handles function signature analysis, argument validation, and pre-parsing of JSON arguments.
+*   **`is_async`**: A boolean indicating if the tool's function is asynchronous.
+
+## How Tools are Defined
+
+Tools are typically defined in one of two ways:
+
+1.  **As methods within an Application class:** This is the most common approach. Each public method in your `APIApplication` or `GraphQLApplication` that you want to expose as a tool for the AI will be automatically converted into a `Tool` object when registered.
+    ```python
+    from universal_mcp.applications import APIApplication
+
+    class MyServiceApp(APIApplication):
+        def __init__(self, integration=None):
+            super().__init__(name="myservice", integration=integration)
+            self.base_url = "https://api.myservice.com"
+
+        def get_user_details(self, user_id: str) -> dict:
+            """
+            Retrieves details for a specific user.
+
+            Args:
+                user_id: The unique identifier for the user.
+
+            Returns:
+                A dictionary containing the user's details.
+            """
+            response = self._get(f"/users/{user_id}")
+            return response.json()
+
+        def list_tools(self):
+            return [self.get_user_details]
+    ```
+    In this example, `get_user_details` would become a tool.
+
+2.  **As standalone Python functions:** You can also define regular Python functions and register them as tools with a `ToolManager`.
+    ```python
+    async def custom_data_processor(data: list, filter_value: str) -> list:
+        """
+        Processes a list of data items and filters them.
+
+        Args:
+            data: The list of items to process.
+            filter_value: The value to filter by.
+
+        Returns:
+            A filtered list of items.
+        """
+        # processing logic
+        return [item for item in data if item.get("key") == filter_value]
+
+    tool_manager.add_tool(custom_data_processor, name="process_and_filter_data")
+    ```
+    This is useful for creating utility tools or functions that don't naturally belong to a specific external API Application. (Ref: [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) - `calculate function`)
+
+
+## Key Features of Universal MCP Tools
+
+*   **Automatic Metadata Generation:** The system automatically parses docstrings (summary, args, returns, tags) and type hints to generate the `description` and `parameters` schema for the tool. (Ref: [`tools/tools.py - Tool.from_function`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py), [`utils/docstring_parser.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/utils/docstring_parser.py))
+*   **Input Validation:** Uses Pydantic models ([`ArgModelBase`, `FuncMetadata`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/func_metadata.py)) for robust validation of arguments passed to tools.
+*   **JSON Pre-parsing:** [`FuncMetadata`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/func_metadata.py) can pre-parse stringified JSON arguments, which is often helpful when interacting with LLMs that might not format JSON perfectly.
+*   **Synchronous and Asynchronous Support:** Tools can be either regular Python functions or `async` functions. The `ToolManager` and `Tool` execution logic handle both seamlessly.
+*   **Adaptability:** Tools can be converted into formats compatible with different AI agent frameworks like Langchain and OpenAI Functions using adapters. (Ref: [`tools/adapters.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/adapters.py))
+
+By defining clear, well-documented tools, you provide AI agents with the precise capabilities they need to interact effectively with external systems.

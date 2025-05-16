@@ -1,0 +1,106 @@
+---
+title: Creating and Registering Custom Tools
+---
+
+While many tools will be methods within your `Application` classes (tied to specific external services), Universal MCP also allows you to define and register standalone Python functions as custom tools. This is useful for:
+
+*   Utility functions that your AI agent might need.
+*   Functions that perform computations or data transformations not tied to an external API.
+*   Integrating local scripts or functionalities.
+
+## Defining a Custom Tool Function
+
+A custom tool is simply a Python function. To ensure it integrates well with Universal MCP and is understandable by AI agents, you should:
+
+1.  **Use Type Hints:** Provide type hints for all arguments and the return value. This helps in generating the correct parameter schema.
+2.  **Write a Clear Docstring:** The docstring is crucial. Universal MCP parses it to generate the tool's `description`, `args_description`, `returns_description`, and `tags`. Follow a style that [`docstring_parser`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/utils/docstring_parser.py) can understand (Google style is recommended).
+
+**Example Custom Tool:**
+
+```python
+from typing import Annotated, List
+
+async def get_stock_price_average(
+    symbols: Annotated[List[str], "A list of stock symbols to fetch prices for."],
+    period_days: Annotated[int, "The number of past days to consider for the average."] = 7
+) -> Annotated[dict, "A dictionary mapping stock symbols to their average price."]:
+    """
+    Calculates the average stock price for a list of symbols over a given period.
+    (This is a mock function for demonstration.)
+
+    Args:
+        symbols: A list of stock ticker symbols (e.g., ["AAPL", "MSFT"]).
+        period_days: The number of days to average the price over. Defaults to 7.
+
+    Returns:
+        A dictionary where keys are stock symbols and values are their mock average prices.
+        Example: {"AAPL": 150.75, "MSFT": 280.50}
+
+    Raises:
+        ValueError: If the list of symbols is empty.
+
+    Tags:
+        finance, stock, average, utility, async_job
+    """
+    if not symbols:
+        raise ValueError("The list of symbols cannot be empty.")
+
+    # In a real scenario, you'd fetch actual data here.
+    # This is a mock implementation.
+    mock_avg_prices = {}
+    for symbol in symbols:
+        mock_avg_prices[symbol] = (len(symbol) * 10) + (period_days * 1.5) # Arbitrary calculation
+    return mock_avg_prices
+```
+
+## Registering Custom Tools with `ToolManager`
+
+Once your function is defined, you use the `ToolManager` to register it. You have two primary methods:
+
+1.  **`ToolManager.add_tool(fn: Callable[..., Any] | Tool, name: str | None = None) -> Tool`**:
+    This is the most direct way. You pass the function object itself.
+    *   If `name` is not provided, the function's `__name__` is used.
+    *   It's good practice to provide an explicit, descriptive name, especially if the function name is generic.
+    *   This method internally calls [`Tool.from_function(fn, name=name)`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py) to create the `Tool` object.
+
+    ```python
+    from universal_mcp.tools import ToolManager
+
+    tool_manager = ToolManager()
+
+    # Registering the function directly
+    registered_stock_tool = tool_manager.add_tool(
+        get_stock_price_average,
+        name="calculate_average_stock_prices" # Explicit name
+    )
+    print(f"Registered tool: {registered_stock_tool.name}")
+    ```
+
+2.  **Creating a `Tool` instance explicitly and then registering:**
+    This gives you more control if you need to customize `Tool` creation, though `add_tool` is usually sufficient.
+
+    ```python
+    from universal_mcp.tools import Tool, ToolManager
+
+    # Create Tool instance first
+    stock_tool_instance = Tool.from_function(get_stock_price_average, name="calculate_average_stock_prices")
+
+    tool_manager.add_tool(stock_tool_instance)
+    ```
+    The [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) file demonstrates adding a simple `calculate` function as a tool.
+
+
+## Best Practices for Custom Tools
+
+*   **Clear Naming:** Choose a tool name that clearly indicates its purpose.
+*   **Comprehensive Docstrings:** The quality of your docstring directly impacts how well an LLM can understand and use your tool. Include:
+    *   A concise summary.
+    *   Detailed descriptions for each argument (`Args:`).
+    *   A clear description of what the tool returns (`Returns:`).
+    *   Potential exceptions it might raise (`Raises:`).
+    *   Relevant `Tags:` for categorization and discovery.
+*   **Type Hinting:** Accurate type hints enable robust input validation and schema generation.
+*   **Error Handling:** Implement proper error handling within your tool function and document potential exceptions in the docstring.
+*   **Idempotency (if applicable):** If a tool performs an action that has side effects, consider if it can be made idempotent.
+
+By following these practices, you can create powerful and reliable custom tools that seamlessly integrate into your Universal MCP-powered AI agents.

@@ -1,0 +1,51 @@
+---
+title: Using MCP Tools with Langchain
+mode: "wide"
+---
+
+Langchain is a comprehensive framework for developing applications powered by language models. Its agent capabilities are particularly well-suited for using tools. Universal MCP provides adapters to make its tools easily consumable by Langchain agents, especially those built with LangGraph.
+
+## Core Steps
+
+1.  **Initialize your LLM:** Choose and configure the language model you want your agent to use (e.g., `ChatOpenAI`).
+2.  **Initialize `ToolManager`:** This is the central registry for your MCP tools.
+    ```python
+    from universal_mcp.tools import ToolManager
+    tool_manager = ToolManager()
+    ```
+3.  **Load Applications and Register Tools:**
+    *   Load your desired `Application` instances (e.g., using `app_from_slug` or direct instantiation).
+    *   Register their tools with the `ToolManager` using `tool_manager.register_tools_from_app(your_app_instance)`.
+    *   Add any custom standalone tools using `tool_manager.add_tool(your_function)`.
+4.  **Convert Tools to Langchain Format:**
+    The `ToolManager` can list tools in a format compatible with Langchain.
+    ```python
+    from universal_mcp.tools.adapters import ToolFormat
+    langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
+    ```
+    This uses the [`convert_tool_to_langchain_tool`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/adapters.py) adapter internally, which wraps your MCP tool's `run` method within a Langchain `StructuredTool`.
+5.  **Create a Langchain Agent:**
+    Use a Langchain agent constructor, like `create_react_agent` from `langgraph.prebuilt`, passing the `llm` and the `langchain_tools`.
+    ```python
+    from langchain_openai import ChatOpenAI # Or your preferred LLM
+    from langgraph.prebuilt import create_react_agent
+
+    llm = ChatOpenAI(model="gpt-4o-mini") # Example
+    agent_executor = create_react_agent(
+        llm,
+        tools=langchain_tools,
+        prompt="You are a helpful assistant that can use tools." # Customize as needed
+    )
+    ```
+    The ReAct (Reasoning and Acting) agent is a common choice that works well with tools.
+6.  **Invoke the Agent:**
+    Call the agent with user input.
+    ```python
+    async def run_agent(prompt_text):
+        result = await agent_executor.ainvoke(
+            input={"messages": [{"role": "user", "content": prompt_text}]}
+        )
+        print(result["messages"][-1].content)
+    ```
+
+This pattern of initializing `ToolManager`, registering tools (either from applications or custom functions), converting them, and then passing them to a Langchain agent is fundamental. The subsequent example guides will build upon this by using tools from specific MCP applications.
