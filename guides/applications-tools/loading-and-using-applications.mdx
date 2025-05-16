@@ -44,7 +44,7 @@ reddit_integration = AgentRIntegration(name="reddit") # 'name' should match the 
 reddit_app_instance = RedditAppClass(integration=reddit_integration)
 
 # Now you can register its tools with a ToolManager
-# tool_manager.register_tools_from_app(reddit_app_instance)
+tool_manager.register_tools_from_app(reddit_app_instance)
 ```
 
 This approach is commonly used in the example agent scripts (like [`examples/reddit_summary.py`](https://github.com/universal-mcp/examples/blob/master/agents/reddit_summary.py) or [`examples/like_tweet.py`](https://github.com/universal-mcp/examples/blob/master/agents/like_tweet.py)) to quickly set up applications.
