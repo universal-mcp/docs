@@ -30,7 +30,7 @@ service_env_integration = ApiKeyIntegration(name="MY_SERVICE_API_KEY", store=env
 # Example 2: Using MemoryStore (for testing, credentials lost on exit)
 mem_store = MemoryStore()
 # You'd typically set the key in the store first for MemoryStore if not prompting:
-# mem_store.set("TEST_SERVICE_API_KEY", "test_key_123")
+mem_store.set("TEST_SERVICE_API_KEY", "test_key_123")
 service_mem_integration = ApiKeyIntegration(name="TEST_SERVICE_API_KEY", store=mem_store)
 
 # Example 3: Using KeyringStore (securely uses system keychain)
