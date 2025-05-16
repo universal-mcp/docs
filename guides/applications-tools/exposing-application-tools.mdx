@@ -84,10 +84,4 @@ The descriptions and parameter schemas generated for each tool are critical for 
 
 By correctly implementing `list_tools()` in your applications and using `ToolManager` to register them, you make your application's functionalities available to AI agents in a structured and discoverable manner.
 
-```
-[1] applications/application.py - BaseApplication.list_tools abstract method
-[2] tools/manager.py - ToolManager class
-[3] tools/manager.py - ToolManager.register_tools_from_app method
-[4] tools/tools.py - Tool.from_function method
-[5] tools/manager.py - ToolManager.list_tools method and ToolFormat enum from tools/adapters.py
-```
+Refer to [`tools/manager.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/manager.py) for more information

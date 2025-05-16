@@ -22,7 +22,7 @@ Langchain is a comprehensive framework for developing applications powered by la
     from universal_mcp.tools.adapters import ToolFormat
     langchain_tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
     ```
-    This uses the `convert_tool_to_langchain_tool` adapter internally, which wraps your MCP tool's `run` method within a Langchain `StructuredTool`. [1]
+    This uses the [`convert_tool_to_langchain_tool`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/adapters.py) adapter internally, which wraps your MCP tool's `run` method within a Langchain `StructuredTool`.
 5.  **Create a Langchain Agent:**
     Use a Langchain agent constructor, like `create_react_agent` from `langgraph.prebuilt`, passing the `llm` and the `langchain_tools`.
     ```python
@@ -49,7 +49,7 @@ Langchain is a comprehensive framework for developing applications powered by la
 
 ## Example Flow from `examples/langraph.py`
 
-The `examples/langraph.py` script demonstrates a very simple agent with a custom `calculate` tool: [2]
+The [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) script demonstrates a very simple agent with a custom `calculate` tool:
 
 ```python
 # (LLM Initialization)
@@ -74,8 +74,3 @@ result = await agent.ainvoke(...)
 ```
 
 This pattern of initializing `ToolManager`, registering tools (either from applications or custom functions), converting them, and then passing them to a Langchain agent is fundamental. The subsequent example guides will build upon this by using tools from specific MCP applications.
-
-```
-[1] tools/adapters.py - convert_tool_to_langchain_tool, ToolFormat
-[2] examples/agents/langraph.py
-```

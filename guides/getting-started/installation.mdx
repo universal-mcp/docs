@@ -8,7 +8,7 @@ Getting Universal MCP set up in your environment is straightforward.
 
 *   **Python:** Universal MCP requires Python 3.8 or higher. You can check your Python version by running `python --version`.
 *   **pip:** Ensure you have pip, the Python package installer, available. It usually comes with Python.
-*   **uv (Optional but Recommended for Application Packages):** For installing application packages dynamically (used by `app_from_slug`), Universal MCP utilizes `uv`. If `uv` is not found in your PATH, the system will attempt to use common installation paths. Ensure `uv` is installed and accessible for the best experience with dynamic application loading. You can install `uv` by following the instructions on its [official website](https://github.com/astral-sh/uv).
+*   **uv (Optional but Recommended for Application Packages):** For installing application packages dynamically (used by `app_from_slug`), Universal MCP utilizes `uv`. If `uv` is not found in your PATH, the system will attempt to use common installation paths. Ensure `uv` is installed and accessible for the best experience with dynamic application loading. You can install `uv` by following the instructions on its [official website](https://docs.astral.sh/uv/#installation).
 
 ## Installing Universal MCP
 
@@ -30,17 +30,13 @@ The command is:
 universal_mcp install <app_name>
 ```
 
-Replace `<app_name>` with the name of the application you wish to install (e.g., `claude`, `cursor`, `github`). This command typically configures your local environment to point to the Universal MCP system, often involving an AgentR API key. [1]
+Replace `<app_name>` with the name of the application you wish to install (e.g., `claude`, `cursor`, `github`). This command typically configures your local environment to point to the Universal MCP system, often involving an AgentR API key.
+Refer to [`cli.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/cli.py) for more information.
 
-For a list of currently supported applications for this installation method, you can often find them by running the command without an app name or with a non-existent one, or refer to the `utils/installation.py` file in the SDK.
+For a list of currently supported applications for this installation method, you can often find them by running the command without an app name or with a non-existent one, or refer to the [`utils/installation.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/utils/installation.py) file in the SDK.
 
 Supported applications include: `claude`, `cursor`, `cline`, `continue`, `goose`, `windsurf`, `zed`. [2]
 
 **Note:** While `universal_mcp install` helps with client-side configuration for certain pre-defined apps, the core way to make tools available to your MCP server (especially a `LocalServer`) is by configuring them in your server's configuration file, which we'll cover next. Dynamically loaded applications via `app_from_slug` also rely on `uv` for package installation.
 
 With Universal MCP installed, you're ready to configure and run your first server!
-
-```
-[1] cli.py
-[2] utils/installation.py
-```

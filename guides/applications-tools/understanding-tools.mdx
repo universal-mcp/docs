@@ -70,18 +70,10 @@ Tools are typically defined in one of two ways:
 
 ## Key Features of Universal MCP Tools
 
-*   **Automatic Metadata Generation:** The system automatically parses docstrings (summary, args, returns, tags) and type hints to generate the `description` and `parameters` schema for the tool. (Ref: `tools/tools.py - Tool.from_function`, `utils/docstring_parser.py`) [1, 4]
-*   **Input Validation:** Uses Pydantic models (`ArgModelBase`, `FuncMetadata`) for robust validation of arguments passed to tools. [2]
-*   **JSON Pre-parsing:** `FuncMetadata` can pre-parse stringified JSON arguments, which is often helpful when interacting with LLMs that might not format JSON perfectly. [2]
+*   **Automatic Metadata Generation:** The system automatically parses docstrings (summary, args, returns, tags) and type hints to generate the `description` and `parameters` schema for the tool. (Ref: [`tools/tools.py - Tool.from_function`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py), [`utils/docstring_parser.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/utils/docstring_parser.py))
+*   **Input Validation:** Uses Pydantic models ([`ArgModelBase`, `FuncMetadata`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/func_metadata.py)) for robust validation of arguments passed to tools.
+*   **JSON Pre-parsing:** [`FuncMetadata`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/func_metadata.py) can pre-parse stringified JSON arguments, which is often helpful when interacting with LLMs that might not format JSON perfectly.
 *   **Synchronous and Asynchronous Support:** Tools can be either regular Python functions or `async` functions. The `ToolManager` and `Tool` execution logic handle both seamlessly.
-*   **Adaptability:** Tools can be converted into formats compatible with different AI agent frameworks like Langchain and OpenAI Functions using adapters. (Ref: `tools/adapters.py`) [5]
+*   **Adaptability:** Tools can be converted into formats compatible with different AI agent frameworks like Langchain and OpenAI Functions using adapters. (Ref: [`tools/adapters.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/adapters.py))
 
 By defining clear, well-documented tools, you provide AI agents with the precise capabilities they need to interact effectively with external systems.
-
-```
-[1] tools/tools.py - Tool class definition and from_function method
-[2] tools/func_metadata.py - FuncMetadata and ArgModelBase classes
-[3] examples/langraph.py - calculate function example
-[4] utils/docstring_parser.py - parse_docstring function
-[5] tools/adapters.py - ToolFormat and conversion functions
-```

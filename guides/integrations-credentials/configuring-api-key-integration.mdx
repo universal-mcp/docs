@@ -2,7 +2,7 @@
 title: Configuring API Key Integration
 ---
 
-The `ApiKeyIntegration` is designed for services that authenticate using a simple API key. It handles the retrieval of this key, typically from a configured [Store](#guides/integrations-credentials/secure-credential-storage), and makes it available to the `Application`.
+The `ApiKeyIntegration` is designed for services that authenticate using a simple API key. It handles the retrieval of this key, typically from a configured [Store](/guides/integrations-credentials/secure-credential-storage), and makes it available to the `Application`.
 
 ## How `ApiKeyIntegration` Works
 
@@ -87,9 +87,3 @@ service_mem_integration.api_key = "new_api_key_value" # also works and uses the 
 keyring_store.set("SECURE_SERVICE_API_KEY", "your_secure_key_from_user_input")
 ```
 The `ApiKeyIntegration.authorize()` method provides a message guiding the user to set the API key in the store if it's missing.
-
-```
-[1] applications/application.py - APIApplication._get_headers method
-[2] integrations/integration.py - ApiKeyIntegration class, sanitize_api_key_name function
-[3] integrations/__init__.py - integration_from_config function
-```

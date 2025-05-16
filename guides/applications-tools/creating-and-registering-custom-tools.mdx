@@ -13,7 +13,7 @@ While many tools will be methods within your `Application` classes (tied to spec
 A custom tool is simply a Python function. To ensure it integrates well with Universal MCP and is understandable by AI agents, you should:
 
 1.  **Use Type Hints:** Provide type hints for all arguments and the return value. This helps in generating the correct parameter schema.
-2.  **Write a Clear Docstring:** The docstring is crucial. Universal MCP parses it to generate the tool's `description`, `args_description`, `returns_description`, and `tags`. Follow a style that `docstring_parser` can understand (Google style is recommended). [1]
+2.  **Write a Clear Docstring:** The docstring is crucial. Universal MCP parses it to generate the tool's `description`, `args_description`, `returns_description`, and `tags`. Follow a style that [`docstring_parser`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/utils/docstring_parser.py) can understand (Google style is recommended).
 
 **Example Custom Tool:**
 
@@ -61,7 +61,7 @@ Once your function is defined, you use the `ToolManager` to register it. You hav
     This is the most direct way. You pass the function object itself.
     *   If `name` is not provided, the function's `__name__` is used.
     *   It's good practice to provide an explicit, descriptive name, especially if the function name is generic.
-    *   This method internally calls `Tool.from_function(fn, name=name)` to create the `Tool` object. [2]
+    *   This method internally calls [`Tool.from_function(fn, name=name)`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py) to create the `Tool` object.
 
     ```python
     from universal_mcp.tools import ToolManager
@@ -87,7 +87,7 @@ Once your function is defined, you use the `ToolManager` to register it. You hav
 
     # tool_manager.add_tool(stock_tool_instance)
     ```
-    The `examples/langraph.py` file demonstrates adding a simple `calculate` function as a tool. [3]
+    The [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) file demonstrates adding a simple `calculate` function as a tool.
 
 
 ## Best Practices for Custom Tools
@@ -104,9 +104,3 @@ Once your function is defined, you use the `ToolManager` to register it. You hav
 *   **Idempotency (if applicable):** If a tool performs an action that has side effects, consider if it can be made idempotent.
 
 By following these practices, you can create powerful and reliable custom tools that seamlessly integrate into your Universal MCP-powered AI agents.
-
-```
-[1] utils/docstring_parser.py - parse_docstring function
-[2] tools/manager.py - ToolManager.add_tool method, tools/tools.py - Tool.from_function method
-[3] examples/agents/langraph.py - `tool_manager.add_tool(calculate, name="calculate")`
-```

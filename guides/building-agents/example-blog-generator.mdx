@@ -2,7 +2,7 @@
 title: Generating and Publishing a Blog Post with Langchain
 ---
 
-This advanced example demonstrates an AI agent that can research a topic, generate a blog post, create a cover image, and publish it to Hashnode. It combines tools from `hashnode`, `perplexity` (for research), and `falai` (for image generation) MCP applications. This is based on `examples/blog.py`. [1]
+This advanced example demonstrates an AI agent that can research a topic, generate a blog post, create a cover image, and publish it to Hashnode. It combines tools from `hashnode`, `perplexity` (for research), and `falai` (for image generation) MCP applications. This is based on [`examples/blog.py`](https://github.com/universal-mcp/examples/blob/master/agents/blog.py).
 
 ## Objective
 
@@ -132,7 +132,3 @@ The agent will execute a complex sequence:
 4.  Finally, it uses a Hashnode tool (e.g., `hashnode_publish_post`), providing the generated Markdown content, title, slug, tags, and the cover image URL to publish the post.
 
 This example highlights the power of Universal MCP in enabling agents to perform sophisticated, multi-step tasks by orchestrating tools from completely different services.
-
-```
-[1] examples/agnets/blog.py
-```

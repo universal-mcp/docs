@@ -18,7 +18,7 @@ Replace `path/to/your/config.json` with the actual path to your server configura
 universal_mcp run --config local_config.json
 ```
 
-If you omit the `--config` option, the server will attempt to start with default `ServerConfig` values, which might not load any specific applications unless defined via environment variables or other default mechanisms. [1]
+If you omit the `--config` option, the server will attempt to start with default `ServerConfig` values, which might not load any specific applications unless defined via environment variables or other default mechanisms. Refer to [`cli.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/cli.py) for more information.
 
 ## Verifying the Server is Running
 
@@ -57,7 +57,3 @@ With the server running:
 Your MCP server is now ready to serve tools to AI agents or other clients! In the next sections, we'll explore how to define these applications and tools, and then how to connect an AI agent to use them.
 
 To stop the server, you can usually press `Ctrl+C` in the terminal where it's running.
-
-```
-[1] cli.py - run command
-```

@@ -2,7 +2,7 @@
 title: Building a Reddit Content Summarizer with Langchain
 ---
 
-This guide demonstrates how to create an AI agent that can fetch posts from a subreddit, categorize them, summarize the content, and then email the summary. It utilizes tools from the Universal MCP `reddit` and `google-mail` applications. This example is based on `examples/reddit_summary.py`. [1]
+This guide demonstrates how to create an AI agent that can fetch posts from a subreddit, categorize them, summarize the content, and then email the summary. It utilizes tools from the Universal MCP `reddit` and `google-mail` applications. This example is based on [`examples/reddit_summary.py`](https://github.com/universal-mcp/examples/blob/master/agents/reddit_summary.py).
 
 ## Objective
 
@@ -125,7 +125,3 @@ The agent will:
 3.  Once the Markdown summary is generated, it will use an email tool (e.g., `google-mail_send_email`) to send the content to the target email address.
 
 This example showcases how an agent can orchestrate multiple tools from different MCP applications to achieve a complex user goal.
-
-```
-[1] examples/agents/reddit_summary.py
-```

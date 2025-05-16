@@ -6,7 +6,7 @@ Once Universal MCP is installed, the next step is to configure your server. This
 
 ## Understanding `ServerConfig`
 
-The `ServerConfig` Pydantic model (found in `config.py`) is the backbone of your server's setup. It defines crucial aspects of how your server behaves. Here are some of ahe key parameters:
+The `ServerConfig` Pydantic model (found in [`config.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/config.py)) is the backbone of your server's setup. It defines crucial aspects of how your server behaves. Here are some of ahe key parameters:
 
 *   **`name`**: A descriptive name for your MCP server (e.g., "My Development MCP").
 *   **`description`**: A brief description of your server.
@@ -78,13 +78,6 @@ In this example:
     *   Typically fetches its application configurations from the AgentR platform using your `AGENTR_API_KEY`.
     *   Integrations are often managed through the AgentR platform itself.
 
-For these guides, we will primarily focus on the `LocalServer` as it's excellent for development and understanding the core mechanics.
+For these guides, we will primarily focus on the `LocalServer` as it's excellent for development and understanding the core mechanics. Refer to [`servers/server.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/servers/server.py) for more information.
 
 With your configuration file ready, you're set to launch the server!
-
-```
-[1] config.py
-[2] servers/server.py - ServerConfig type field
-[3] servers/server.py - LocalServer._load_apps method
-[4] servers/server.py - AgentRServer._fetch_apps method
-```

@@ -8,7 +8,7 @@ Universal MCP makes it straightforward to incorporate and use applications withi
 
 One of the powerful features of Universal MCP is its ability to dynamically load application packages. If an application follows the standard naming convention (`universal-mcp-<app-name>`), it can often be loaded using the `app_from_slug` function.
 
-The `app_from_slug` function (found in `universal_mcp.applications.__init__.py`) handles several tasks:
+The `app_from_slug` function (found in [`applications.__init__.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/applications/__init__.py)) handles several tasks:
 1.  **Derives Names:** It determines the expected package name (e.g., `universal_mcp_my_app`), module path (e.g., `universal_mcp_my_app.app`), and class name (e.g., `MyAppApp`) from the provided slug (e.g., `"my-app"`).
 2.  **Installs/Upgrades Package:** It attempts to install or upgrade the application package from the universal-mcp GitHub repository using `uv`. The packages are installed into a dedicated directory (usually `~/.universal-mcp/packages/`).
 3.  **Imports Module:** It imports the application module.
@@ -47,7 +47,7 @@ reddit_app_instance = RedditAppClass(integration=reddit_integration)
 # tool_manager.register_tools_from_app(reddit_app_instance)
 ```
 
-This approach is commonly used in the example agent scripts (like `examples/reddit_summary.py` or `examples/like_tweet.py`) to quickly set up applications.
+This approach is commonly used in the example agent scripts (like [`examples/reddit_summary.py`](https://github.com/universal-mcp/examples/blob/master/agents/reddit_summary.py) or [`examples/like_tweet.py`](https://github.com/universal-mcp/examples/blob/master/agents/like_tweet.py)) to quickly set up applications.
 
 ## Manual Application Instantiation
 
@@ -96,10 +96,3 @@ When running a `LocalServer`, you typically define which applications to load in
 The `LocalServer` will then iterate through this `apps` list, use `app_from_slug` to load each application class, instantiate it (potentially with the specified integration), and then register its tools.
 
 Once an application is instantiated, its primary use is to provide tools to a `ToolManager`, which then makes them available to AI agents.
-
-```
-[1] applications/__init__.py - app_from_slug function and package installation logic
-[2] utils/common.py - get_default_class_name, get_default_module_path, get_default_package_name functions
-[3] examples/agents/reddit_summary.py, examples/like_tweet.py - get_application function
-[4] servers/server.py - LocalServer._load_app and LocalServer._load_apps methods
-```
