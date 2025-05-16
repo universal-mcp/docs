@@ -6,14 +6,14 @@ In the Universal MCP ecosystem, a **Tool** represents a specific, invokable capa
 
 ## What is a Tool?
 
-Essentially, a Tool in Universal MCP is a Python function (or a method within an Application class) that has been packaged with metadata to make it discoverable and usable by AI agents. The `Tool` class (defined in `tools/tools.py`) encapsulates: [1]
+Essentially, a Tool in Universal MCP is a Python function (or a method within an Application class) that has been packaged with metadata to make it discoverable and usable by AI agents. The `Tool` class (defined in [`tools/tools.py`](https://github.com/universal-mcp/universal-mcp/blob/master/src/universal_mcp/tools/tools.py)) encapsulates:
 
 *   **`fn`**: The actual callable Python function that performs the work.
 *   **`name`**: A unique name for the tool.
 *   **`description`**: A human-readable summary of what the tool does (often parsed from the function's docstring). This is crucial for the AI to understand when to use the tool.
 *   **`args_description`**: Descriptions for each argument the function accepts.
 *   **`parameters`**: A JSON schema defining the expected input arguments for the tool. This allows for structured input and validation.
-*   **`fn_metadata`**: An instance of `FuncMetadata` which handles function signature analysis, argument validation, and pre-parsing of JSON arguments. [2]
+*   **`fn_metadata`**: An instance of `FuncMetadata` which handles function signature analysis, argument validation, and pre-parsing of JSON arguments.
 *   **`is_async`**: A boolean indicating if the tool's function is asynchronous.
 
 ## How Tools are Defined
@@ -63,9 +63,9 @@ Tools are typically defined in one of two ways:
         # processing logic
         return [item for item in data if item.get("key") == filter_value]
 
-    # tool_manager.add_tool(custom_data_processor, name="process_and_filter_data")
+    tool_manager.add_tool(custom_data_processor, name="process_and_filter_data")
     ```
-    This is useful for creating utility tools or functions that don't naturally belong to a specific external API Application. (Ref: `examples/langraph.py - calculate function`) [3]
+    This is useful for creating utility tools or functions that don't naturally belong to a specific external API Application. (Ref: [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) - `calculate function`)
 
 
 ## Key Features of Universal MCP Tools

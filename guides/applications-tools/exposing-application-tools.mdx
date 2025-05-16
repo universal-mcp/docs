@@ -58,7 +58,7 @@ When you have an instance of your application, you use the `ToolManager`'s `regi
 ```python
 from universal_mcp.tools import ToolManager
 # Assuming MyWebApp class is defined as above and instantiated
-# my_web_app_instance = MyWebApp(integration=my_integration)
+my_web_app_instance = MyWebApp(integration=my_integration)
 
 tool_manager = ToolManager()
 tool_manager.register_tools_from_app(app=my_web_app_instance)

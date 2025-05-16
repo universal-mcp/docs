@@ -67,7 +67,7 @@ my_custom_app_integration = ApiKeyIntegration(name="MY_SERVICE_API_KEY", store=m
 my_app = MyCustomApp(integration=my_custom_app_integration)
 
 # Register tools
-# tool_manager.register_tools_from_app(my_app)
+tool_manager.register_tools_from_app(my_app)
 ```
 
 ## Configuring Applications in `ServerConfig`
@@ -79,13 +79,13 @@ When running a `LocalServer`, you typically define which applications to load in
   // ... other server settings ...
   "apps": [
     {
-      "name": "reddit" // This slug will be used by app_from_slug internally
+      "name": "perplexity" // This slug will be used by app_from_slug internally
       // Optional: add integration config if not using a global or AgentR managed one
-      // "integration": {
-      //   "name": "REDDIT_API_KEY_CONFIG",
-      //   "type": "api_key",
-      //   "store": {"type": "environment"}
-      // }
+      "integration": {
+        "name": "PERPLEXITY_API_KEY",
+        "type": "api_key",
+        "store": {"type": "environment"}
+      }
     },
     {
       "name": "my-local-app-slug" // For another app

@@ -83,9 +83,9 @@ Once your function is defined, you use the `ToolManager` to register it. You hav
     from universal_mcp.tools import Tool, ToolManager
 
     # Create Tool instance first
-    # stock_tool_instance = Tool.from_function(get_stock_price_average, name="calculate_average_stock_prices")
+    stock_tool_instance = Tool.from_function(get_stock_price_average, name="calculate_average_stock_prices")
 
-    # tool_manager.add_tool(stock_tool_instance)
+    tool_manager.add_tool(stock_tool_instance)
     ```
     The [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) file demonstrates adding a simple `calculate` function as a tool.
 
