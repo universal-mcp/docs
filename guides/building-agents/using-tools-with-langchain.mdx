@@ -1,5 +1,6 @@
 ---
 title: Using MCP Tools with Langchain
+mode: "wide"
 ---
 
 Langchain is a comprehensive framework for developing applications powered by language models. Its agent capabilities are particularly well-suited for using tools. Universal MCP provides adapters to make its tools easily consumable by Langchain agents, especially those built with LangGraph.
@@ -46,31 +47,5 @@ Langchain is a comprehensive framework for developing applications powered by la
         )
         print(result["messages"][-1].content)
     ```
-
-## Example Flow from `examples/langraph.py`
-
-The [`examples/langraph.py`](https://github.com/universal-mcp/examples/blob/master/agents/langraph.py) script demonstrates a very simple agent with a custom `calculate` tool:
-
-```python
-# (LLM Initialization)
-llm = ChatOpenAI(...)
-
-# Create a tool manager and register a custom tool
-tool_manager = ToolManager()
-tool_manager.add_tool(calculate, name="calculate") # 'calculate' is a custom async function
-
-# Get the list of tools in LangChain format
-tools = tool_manager.list_tools(format=ToolFormat.LANGCHAIN)
-
-# Create a ReAct agent
-agent = create_react_agent(
-    llm,
-    tools=tools,
-    prompt="You are a helpful assistant that can use tools to help the user.",
-)
-
-# Invoke
-result = await agent.ainvoke(...)
-```
 
 This pattern of initializing `ToolManager`, registering tools (either from applications or custom functions), converting them, and then passing them to a Langchain agent is fundamental. The subsequent example guides will build upon this by using tools from specific MCP applications.
