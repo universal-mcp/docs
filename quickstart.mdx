@@ -45,7 +45,7 @@ Welcome! This guide will walk you through the basic steps to set up an applicati
    from universal_mcp.applications import APIApplication # Or your specific App class
    from universal_mcp.integrations import ApiKeyIntegration
    from universal_mcp.stores import EnvironmentStore, MemoryStore
-   from universal_mcp.server import SingleAppMCPServer
+   from universal_mcp.servers import SingleMCPServer
 
    # Option 2b: Using MemoryStore (for quick testing)
    store_mem = MemoryStore()
@@ -62,7 +62,7 @@ Welcome! This guide will walk you through the basic steps to set up an applicati
    app_local_mem = MyApp(name="my-app", integration=integration_mem)
    print(f"Local App '{app_local_mem.name}' initialized. Actions: {app_local_mem.list_tools()}")
 
-   mcp = SingleAppMCPServer(app_local_mem)
+   mcp = SingleMCPServer(app_local_mem)
    ```
 4. **Create your MCP Server.**
 5. **Install MCP server:** Install MCP server on your favourite client using:
